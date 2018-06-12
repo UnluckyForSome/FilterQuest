@@ -7,7 +7,7 @@ Filterquest is a PHP script which requires a POSIX environment with PHP installe
 FilterQuest relies on games being named in the popular ReDump/TOSEC naming conventions, for example "Crash Team Racing (USA)". These games must all be in the same directory.
 
 ## Usage
-On Windows, place the "filterquest" script file into the same directory of the files you want to filter, then using the Cygwin Terminal navigate to the same directory and use "php filterquest" to run.
+On Windows, place the "filterquest" script file into the same directory of the files you want to filter, then using the Cygwin Terminal navigate to the same directory and use `php filterquest` to run.
 
 On Linux use the same method except use the Linux Terminal ;-)
 
