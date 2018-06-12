@@ -27,9 +27,9 @@ foreach($gameArray as $thisGame) {
 		continue;
 	}
 
-	// Cruft e.g. (Demo) or (Kiosk)
+	// Non-full release e.g. (Demo) or (Kiosk)
         if(preg_match('%\((Demo|Kiosk|Debug|Unl|Sample|Beta|Beta \d+|Developer Cart)\)%', $thisGame)) {
-		echo "Cruft - {$thisGame}\n";
+		echo "Non-full release - {$thisGame}\n";
 		shell_exec("mv \"{$thisGame}\" Removed/");
 		continue;
 	}
