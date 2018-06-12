@@ -1,6 +1,7 @@
 #!/bin/php
 ##
 ## Run this from the folder that contains the games for a single specific system.
+## The script is looking for regular game file naming conventions, for example "Crash Team Racing (USA)".
 ## Windows users, please install Cygdrive with PHP enabled to use this script.
 ## Use "php filterquest" to run.
 
@@ -10,7 +11,7 @@
 $gameList  = trim(shell_exec("ls -1"));
 $gameArray = explode("\n", $gameList);
 
-shell_exec('mkdir -p Bad');
+shell_exec('mkdir -p Removed');
 shell_exec('mkdir -p Process');
 
 foreach ($gameArray as $thisGame) {
@@ -25,14 +26,14 @@ foreach ($gameArray as $thisGame) {
     // Non-Engish speaking countries e.g. (France) or (Japan)
     if (preg_match('%\((China|France|Germany|Hungary|Italy|Japan|Brazil|Korea|Spain|Netherlands|Finland|Russia|Portugal|Sweden|Norway|Scandinavia|Greece)\)%', $thisGame)) {
         echo "Foreign - {$thisGame}\n";
-        shell_exec("mv \"{$thisGame}\" Bad/");
+        shell_exec("mv \"{$thisGame}\" Removed/");
         continue;
     }
 
     // Non-full release e.g. (Demo) or (Kiosk)
     if (preg_match('%\((Demo|Kiosk|Debug|Unl|Sample|Beta|Beta \d+|Developer Cart)\)%', $thisGame)) {
         echo "Non-full release - {$thisGame}\n";
-        shell_exec("mv \"{$thisGame}\" Bad/");
+        shell_exec("mv \"{$thisGame}\" Removed/");
         continue;
     }
 
@@ -42,7 +43,7 @@ foreach ($gameArray as $thisGame) {
         $fCheck = trim(shell_exec("ls -1 \"{$niceName} (USA)\"* 2>/dev/null"));
         if ($fCheck) {
             echo "Better version available - {$thisGame}\n";
-            shell_exec("mv \"{$thisGame}\" Bad/");
+            shell_exec("mv \"{$thisGame}\" Removed/");
             continue;
         }
 
@@ -52,7 +53,7 @@ foreach ($gameArray as $thisGame) {
             $fCheck = trim(shell_exec("ls -1 \"{$niceName} (USA, Korea)\"* 2>/dev/null"));
         if ($fCheck) {
             echo "Better version available - {$thisGame}\n";
-            shell_exec("mv \"{$thisGame}\" Bad/");
+            shell_exec("mv \"{$thisGame}\" Removed/");
             continue;
         }
     }
@@ -63,7 +64,7 @@ foreach ($gameArray as $thisGame) {
         $languageArray = explode(',', str_replace(')', '', trim($languageArray[1])));
         if (!in_array('En', $languageArray)) {
             echo "Non-English - {$thisGame}\n";
-            shell_exec("mv \"{$thisGame}\" Bad/");
+            shell_exec("mv \"{$thisGame}\" Removed/");
             continue;
         }
     }
@@ -92,7 +93,7 @@ foreach ($gameArray as $thisGame) {
             if ($revNum < $thisRev) {
                 // Other version is newer, bin ours
                 echo "Inferior version [{$revNum} VS. {$thisRev}] - {$thisGame}\n";
-                shell_exec("mv \"{$thisGame}\" Bad/");
+                shell_exec("mv \"{$thisGame}\" Removed/");
                 continue 2;
             }
         }
@@ -113,7 +114,7 @@ foreach ($gameArray as $thisGame) {
             if ($revNum < $thisRev) {
                 // Other version is newer, bin ours
                 echo "Inferior version [{$revNum} VS. {$thisRev}] - {$thisGame}\n";
-                shell_exec("mv \"{$thisGame}\" Bad/");
+                shell_exec("mv \"{$thisGame}\" Removed/");
                 continue 2;
             }
         }
