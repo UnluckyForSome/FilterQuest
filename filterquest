@@ -22,14 +22,14 @@ foreach($gameArray as $thisGame) {
 
 	// Non-Engish speaking countries e.g. (France) or (Japan)
         if(preg_match('%\((China|France|Germany|Hungary|Italy|Japan|Brazil|Korea|Spain|Netherlands|Finland|Russia|Portugal|Sweden|Norway|Scandinavia|Greece)\)%', $thisGame)) {
-		echo "Foreign release found. Removing {$thisGame}\n";
+		echo "{$thisGame} is a foreign release. Moved to Removed folder.\n";
 		shell_exec("mv \"{$thisGame}\" Removed/");
 		continue;
 	}
 
 	// Non-full release e.g. (Demo) or (Kiosk)
         if(preg_match('%\((Demo|Kiosk|Debug|Unl|Sample|Beta|Beta \d+|Developer Cart)\)%', $thisGame)) {
-		echo "Non-full release found. Removing {$thisGame}\n";
+		echo "{$thisGame} is a non-retail release. Moved to Removed folder.\n";
 		shell_exec("mv \"{$thisGame}\" Removed/");
 		continue;
 	}
@@ -39,7 +39,7 @@ foreach($gameArray as $thisGame) {
 		// Check for pure USA only version
 		$fCheck = trim(shell_exec("ls -1 \"{$niceName} (USA)\"* 2>/dev/null"));
 		if($fCheck) {
-			echo "Better version available than {$thisGame}\n... Removing!";
+			echo "{$thisGame} has a better version available. Moved to Removed folder.\n";
 			shell_exec("mv \"{$thisGame}\" Removed/");
 			continue;
 		}
@@ -48,7 +48,7 @@ foreach($gameArray as $thisGame) {
 		$fCheck = trim(shell_exec("ls -1 \"{$niceName} (Japan, USA)\"* 2>/dev/null"));
 		if(!$fCheck) $fCheck = trim(shell_exec("ls -1 \"{$niceName} (USA, Korea)\"* 2>/dev/null"));
 		if($fCheck) {
-			echo "Better version available. Removing {$thisGame}\n";
+			echo "{$thisGame} has a better version available. Moved to Removed folder.\n";
 			shell_exec("mv \"{$thisGame}\" Removed/");
 			continue;
 		}
@@ -59,7 +59,7 @@ foreach($gameArray as $thisGame) {
 		// Preg match leaves trailing ) so remove it
 		$languageArray = explode(',', str_replace(')', '', trim($languageArray[1])));
 		if(!in_array('En', $languageArray)) {
-			echo "Non-English European version found. Removing - {$thisGame}\n";
+			echo "{$thisGame} is a non-english euro release. Moved to Removed folder.\n";
 			shell_exec("mv \"{$thisGame}\" Removed/");
 			continue;
 		}
