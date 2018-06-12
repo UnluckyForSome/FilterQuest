@@ -21,8 +21,8 @@ foreach($gameArray as $thisGame) {
 	$niceName = trim(preg_replace('%[\(|\[].*%', '', $thisGame));
 
 	// Non-Engish speaking countries e.g. (France) or (Japan)
-        if(preg_match('%\((China|France|Germany|Hungary|Italy|Japan|Brazil|Korea|Spain|Netherlands|Finland|Russia|Portugal|Sweden|Norway|Scandinavia|Greece)\)%', $thisGame)) {
-		echo "{$thisGame} is a foreign release. Moved to Removed folder.\n";
+        if(preg_match('%\((Austria|Brazil|China|Denmark|Finland|France|Germany|Greece|Hungary|Israel|Italy|Japan|Korea|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|Spain|Sweden)\)%', $thisGame)) {
+		echo "{$thisGame} is a foreign language release. Moved to Removed folder.\n";
 		shell_exec("mv \"{$thisGame}\" Removed/");
 		continue;
 	}
