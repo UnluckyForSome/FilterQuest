@@ -7,9 +7,11 @@
 
 $gameList = trim(shell_exec("ls -1"));
 $gameArray = explode("\n", $gameList);
+$file = file_get_contents('manualremove.txt')
 
 shell_exec('mkdir -p Removed');
 shell_exec('mkdir -p Process');
+
 
 foreach($gameArray as $thisGame) {
 	if(!$thisGame) continue;
@@ -18,12 +20,11 @@ foreach($gameArray as $thisGame) {
 
 	$niceName = trim(preg_replace('%[\(|\[].*%', '', $thisGame));
 
-	// Test
-      	if (in_array("Glenn", $thisGame))
-		echo "{$thisGame} is Glenn.\n";
-		shell_exec("mv \"{$thisGame}\" Removed/");
-		continue;
-		}
+if(preg_match ($file, $thisGame)
+echo "{$thisGame} is on the manual remove list (manualremove.txt)\n";
+shell_exec("mv \"{$thisGame}\" Removed/");
+continue;
+}
 
 	// Non-Engish speaking countries e.g. (France) or (Japan)
         if(preg_match('%\((Asia|Austria|Brazil|China|Denmark|Finland|France|Germany|Greece|Hungary|Israel|Italy|Japan|Korea|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|Spain|Sweden)\)%', $thisGame)) {
