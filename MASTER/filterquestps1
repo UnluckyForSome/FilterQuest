@@ -11,28 +11,53 @@ shell_exec('mkdir -p Removed');
 shell_exec('mkdir -p Process');
 
 
-// Make sure what manualremove.txt is doing
-if (file_exists('manualremove.txt'))
+// Make sure what manualregiondupes.txt is doing
+if (file_exists('manualregiondupes.txt'))
 {
-    $manualRemoveFile = file('manualremove.txt', FILE_IGNORE_NEW_LINES);
-    $manualRemovePattern = "/(?:" . implode("|", array_map(function ($i)
+    $manualRegionDupes = file('manualregiondupes.txt', FILE_IGNORE_NEW_LINES);
+    $manualRegionPattern = "/(?:" . implode("|", array_map(function ($i)
     {
         return preg_quote(trim($i) , "/");
     }
-    , $manualRemoveFile)) . ')/';
-    echo "ManualRemove.txt has been found, ";
-    if (trim(file_get_contents('manualremove.txt')) == false)
+    , $manualRegionDupes)) . ')/';
+    echo "ManualRegeionDupes.txt has been found, ";
+    if (trim(file_get_contents('manualregiondupes.txt')) == false)
     {
-        echo "but is empty! Continuing without manual filter.\n";
+        echo "but is empty! Continuing without manual region dupes filter.\n";
     }
     else
     {
-        echo "and is NOT empty! Applying manual names to filter.\n";
+        echo "and is NOT empty! Applying the manual region dupes filter.\n";
     }
 }
 else
 {
-    echo "ManualRemove.txt has NOT been found. Continuing without manual filter.\n";
+    echo "ManualRegionDupes.txt has NOT been found. Continuing without the manual region dupes filter.\n";
+}
+
+
+// Make sure what manualdemos.txt is doing
+if (file_exists('manualdemos.txt'))
+{
+    $manualDemos = file('manualdemos.txt', FILE_IGNORE_NEW_LINES);
+    $manualDemosPattern = "/(?:" . implode("|", array_map(function ($i)
+    {
+        return preg_quote(trim($i) , "/");
+    }
+    , $manualDemos)) . ')/';
+    echo "ManualDemos.txt has been found, ";
+    if (trim(file_get_contents('manualdemos.txt')) == false)
+    {
+        echo "but is empty! Continuing without manual demos filter.\n";
+    }
+    else
+    {
+        echo "and is NOT empty! Applying the manual demos filter.\n";
+    }
+}
+else
+{
+    echo "ManualDemos.txt has NOT been found. Continuing without the manual region dupes filter.\n";
 }
 
 
@@ -46,14 +71,29 @@ foreach ($gameArray as $thisGame)
     $niceName = trim(preg_replace('%[\(|\[].*%', '', $thisGame));
 
 
-    // Filenames in manualremove.txt
-    if (file_exists('manualremove.txt'))
+    // Filenames in manualregiondupes.txt
+    if (file_exists('manualregiondupes.txt'))
     {
-        if (trim(file_get_contents('manualremove.txt')) == true)
+        if (trim(file_get_contents('manualregiondupes.txt')) == true)
         {
-            if (preg_match($manualRemovePattern, $thisGame))
+            if (preg_match($manualRegionPattern, $thisGame))
             {
-                echo "{$thisGame} is on the manual remove list.\n";
+                echo "{$thisGame} is on the manual region dupes remove list. Moved to Removed folder.\n";
+                shell_exec("mv \"{$thisGame}\" Removed/");
+                continue;
+            }
+        }
+    }
+
+
+    // Filenames in manualdemos.txt
+    if (file_exists('manualdemos.txt'))
+    {
+        if (trim(file_get_contents('manualdemos.txt')) == true)
+        {
+            if (preg_match($manualDemosPattern, $thisGame))
+            {
+                echo "{$thisGame} is on the manual demos remove list. Moved to Removed folder.\n";
                 shell_exec("mv \"{$thisGame}\" Removed/");
                 continue;
             }
@@ -62,7 +102,7 @@ foreach ($gameArray as $thisGame)
 
 
     // Non-Engish speaking countries e.g. (France) or (Japan)
-    if (preg_match('%\((Asia|Austria|Brazil|China|Denmark|Finland|France|Germany|Greece|Hungary|Israel|Italy|Japan|Korea|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|Spain|Sweden)\)%', $thisGame))
+    if (preg_match('%\((Asia|Austria|Brazil|China|Denmark|Finland|France|Germany|Greece|Hungary|Israel|Italy|Japan|Japan, Asia|Korea|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|Spain|Sweden)\)%', $thisGame))
     {
         echo "{$thisGame} is a foreign language release. Moved to Removed folder.\n";
         shell_exec("mv \"{$thisGame}\" Removed/");
@@ -71,7 +111,7 @@ foreach ($gameArray as $thisGame)
 
 
     // Non-full release e.g. (Demo) or (Kiosk)
-    if (preg_match('%\((Demo|Kiosk|Debug|Unl|Sample|Beta|Beta \d+|Developer Cart)\)%', $thisGame))
+    if (preg_match('%\((Demo|Demo \d+|Kiosk|Debug|Unl|Sample|Beta|Beta \d+|Developer Cart|EDC)\)%', $thisGame))
     {
         echo "{$thisGame} is a non-retail release. Moved to Removed folder.\n";
         shell_exec("mv \"{$thisGame}\" Removed/");

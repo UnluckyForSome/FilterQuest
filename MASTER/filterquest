@@ -86,7 +86,7 @@ foreach($gameArray as $thisGame) {
 
 			if(isset($revNum) && $revNum < $thisRev) {
 				// Other version is newer, bin ours
-				echo "{$thisGame} has an inferior version number [{$revNum} VS. {$thisRev}] - Moved to Removed folder.\n";
+				echo "Inferior version found [{$revNum} VS. {$thisRev}] - Removing {$thisGame}\n";
 				shell_exec("mv \"{$thisGame}\" Removed/");
 				continue 2;
 			}
@@ -105,7 +105,7 @@ foreach($gameArray as $thisGame) {
 
 			if(isset($revNum) && $revNum < $thisRev) {
 				// Other version is newer, bin ours
-				echo "{$thisGame} has an inferior version number [{$revNum} VS. {$thisRev}] - Moved to Removed folder.\n";
+				echo "Inferior version found [{$revNum} VS. {$thisRev}] - Removing {$thisGame}\n";
 				shell_exec("mv \"{$thisGame}\" Removed/");
 				continue 2;
 			}

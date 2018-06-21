@@ -1,6 +1,7 @@
 3, 2, 1, Smurf! My First Racing Game (Europe) (En,Fr,De,Es,It,Nl).zip
 4x4 World Trophy (Europe) (En,Fr,De,Es,It).zip
 A.IV - Evolution Global (Europe) (En,Ja,Fr,De).zip
+Action Man - Mission Xtreme (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi) (EDC)
 Action Man - Mission Xtreme (Europe) (En,Fr,De,Es,It,Nl,Sv,No,Da,Fi) (No EDC).zip
 Actua Golf (Europe) (En,Fr,De).zip
 Actua Golf 2 (Europe).zip
@@ -30,7 +31,6 @@ Driver (Europe).zip
 Duke Nukem (Europe).zip
 Equestriad 2001 (Europe) (En,De,Es).zip
 Exhumed (Europe) (En,Fr,De,Es).zip
-filename2.txt
 Firestorm - Thunderhawk 2 (Europe) (En,Fr).zip
 Fisherman's Bait - Bass Challenge (Europe).zip
 Fisherman's Bait 3 (Europe).zip
@@ -49,8 +49,6 @@ Kurushi (Europe) (En,Fr,De,Es,It).zip
 Le Mans 24 Hours (Europe) (En,Fr,De,Es,It,Pt).zip
 Legend of Kartia (Europe) (En,Fr,De).zip
 Lifeforce Tenka (Europe).zip
-listing.txt
-listing2.txt
 Lomax (Europe) (En,Fr,De,Es,It).zip
 Micro Maniacs (Europe) (En,Fr,De,Es,It).zip
 MoHo (Europe) (En,Fr,De,Es,It).zip
@@ -68,6 +66,7 @@ Prism Land Story (Europe).zip
 Pro Racer (Europe) (v1.1).zip
 Rapid Racer (Europe) (En,Fr,De,Es,It).zip
 Ronin Blade (Europe) (En,Fr,De).zip
+Samurai Shodown III (Europe).zip
 Scooter Racing (Europe).zip
 Shane Warne Cricket (Australia).zip
 Sheep, Dog 'n' Wolf (Europe) (En,Fr,De,Es,It,Nl).zip
