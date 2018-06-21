@@ -7,11 +7,11 @@
 
 $gameList = trim(shell_exec("ls -1"));
 $gameArray = explode("\n", $gameList);
-$file = file_get_contents('manualremove.txt')
+$manualRemoveFile = file('manualremove.txt', FILE_IGNORE_NEW_LINES);
+$manualRemovePattern = "/(?:" . implode("|", array_map(function($i) {return preg_quote(trim($i), "/");}, $manualRemoveFile)) . ')/';
 
 shell_exec('mkdir -p Removed');
 shell_exec('mkdir -p Process');
-
 
 foreach($gameArray as $thisGame) {
 	if(!$thisGame) continue;
@@ -20,11 +20,12 @@ foreach($gameArray as $thisGame) {
 
 	$niceName = trim(preg_replace('%[\(|\[].*%', '', $thisGame));
 
-if(preg_match ($file, $thisGame)
-echo "{$thisGame} is on the manual remove list (manualremove.txt)\n";
-shell_exec("mv \"{$thisGame}\" Removed/");
-continue;
-}
+	// Remove matching filenames in manualremove.txt
+	     if(preg_match ($manualRemovePattern , $thisGame)) {
+	 echo "{$thisGame} is on the manual remove list.\n";
+	 shell_exec("mv \"{$thisGame}\" Removed/");
+	 continue;
+	}
 
 	// Non-Engish speaking countries e.g. (France) or (Japan)
         if(preg_match('%\((Asia|Austria|Brazil|China|Denmark|Finland|France|Germany|Greece|Hungary|Israel|Italy|Japan|Korea|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|Spain|Sweden)\)%', $thisGame)) {
