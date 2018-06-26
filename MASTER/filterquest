@@ -11,7 +11,6 @@ shell_exec('mkdir -p Removed');
 /* shell_exec('mkdir -p Process');
 */
 
-
 // Make sure what manualregiondupes.txt is doing
 if (file_exists('manualregiondupes.txt'))
 {
@@ -35,7 +34,6 @@ else
 {
     echo "ManualRegionDupes.txt has NOT been found. Continuing without the manual region dupes filter.\n";
 }
-
 
 // Make sure what manualdemos.txt is doing
 if (file_exists('manualdemos.txt'))
@@ -69,7 +67,7 @@ foreach ($gameArray as $thisGame)
     if (!file_exists($thisGame)) continue;
 
     $niceName = trim(preg_replace('%[\(|\[].*%', '', $thisGame));
-    $thisGameNoExtension = preg_replace('/\.' . preg_quote(pathinfo($thisGame, PATHINFO_EXTENSION), '/') . '$/', '', $thisGame);
+    $thisGameNoExtension = preg_replace('/\.' . preg_quote(pathinfo($thisGame, PATHINFO_EXTENSION) , '/') . '$/', '', $thisGame);
 
     // Filenames in manualregiondupes.txt
     if (file_exists('manualregiondupes.txt'))
@@ -79,12 +77,11 @@ foreach ($gameArray as $thisGame)
             if (preg_match($manualRegionPattern, $thisGameNoExtension))
             {
                 echo "{$thisGameNoExtension} is on the manual region dupes remove list. Moved to Removed folder.\n";
-                shell_exec("mv ".escapeshellarg($thisGame)." Removed/");
+                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
                 continue;
             }
         }
     }
-
 
     // Filenames in manualdemos.txt
     if (file_exists('manualdemos.txt'))
@@ -94,7 +91,7 @@ foreach ($gameArray as $thisGame)
             if (preg_match($manualDemosPattern, $thisGameNoExtension))
             {
                 echo "{$thisGameNoExtension} is on the manual demos remove list. Moved to Removed folder.\n";
-                shell_exec("mv ".escapeshellarg($thisGame)." Removed/");
+                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
                 continue;
             }
         }
@@ -104,19 +101,17 @@ foreach ($gameArray as $thisGame)
     if (preg_match('%\((Asia|Austria|Brazil|China|Denmark|Finland|France|Germany|Greece|Hungary|Israel|Italy|Japan|Japan, Asia|Korea|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|Spain|Sweden)\)%', $thisGame))
     {
         echo "{$thisGame} is a foreign language release. Moved to Removed folder.\n";
-        shell_exec("mv ".escapeshellarg($thisGame)." Removed/");
+        shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
         continue;
     }
-
 
     // Non-full release e.g. (Demo) or (Kiosk)
     if (preg_match('%\((Demo|Demo \d+|Kiosk|Debug|Unl|Sample|Beta|Beta \d+|Developer Cart|EDC)\)%', $thisGame))
     {
         echo "{$thisGame} is a non-retail release. Moved to Removed folder.\n";
-        shell_exec("mv ".escapeshellarg($thisGame)." Removed/");
+        shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
         continue;
     }
-
 
     // A USA version exists instead, use that
     if (!strstr($thisGame, '(USA)') && !strstr($thisGame, '(Japan, USA)') && !strstr($thisGame, '(USA, Korea)'))
@@ -126,7 +121,7 @@ foreach ($gameArray as $thisGame)
         if ($fCheck)
         {
             echo "{$thisGame} has a better version available. Moved to Removed folder.\n";
-            shell_exec("mv ".escapeshellarg($thisGame)." Removed/");
+            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
             continue;
         }
 
@@ -136,11 +131,10 @@ foreach ($gameArray as $thisGame)
         if ($fCheck)
         {
             echo "{$thisGame} has a better version available. Moved to Removed folder.\n";
-            shell_exec("mv ".escapeshellarg($thisGame)." Removed/");
+            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
             continue;
         }
     }
-
 
     // Remove non-English versions e.g. (Se,De,Fr)
     if (preg_match('%\(Europe\).+\(((?:[A-Za-z]{2}[,|\)])+)%', $thisGame, $languageArray))
@@ -150,11 +144,10 @@ foreach ($gameArray as $thisGame)
         if (!in_array('En', $languageArray))
         {
             echo "{$thisGame} is a non-english euro release. Moved to Removed folder.\n";
-            shell_exec("mv ".escapeshellarg($thisGame)." Removed/");
+            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
             continue;
         }
     }
-
 
     // Check for reversions e.g. (Rev 2) or (Rev A)
     if (preg_match('%\(Rev (\d|[A-Za-z])\)%', $thisGame, $revNum))
@@ -189,15 +182,14 @@ foreach ($gameArray as $thisGame)
             {
                 // Other version is newer, bin ours
                 echo "{$thisGame} has an inferior version number [{$revNum} VS. {$thisRev}] - Moved to Removed folder.\n";
-                shell_exec("mv ".escapeshellarg($thisGame)." Removed/");
+                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
                 continue 2;
             }
         }
     }
 
-
-    // Check for reversions e.g. (v1.01)
-    if (preg_match('%\(v(\d\.\d)\)%', $thisGame, $revNum)) $revNum = $revNum[1];
+    // Check for reversions double digits e.g. (v1.01)
+    if (preg_match('%\(v(\d\.\d\d)\)%', $thisGame, $revNum)) $revNum = $revNum[1];
 
     $otherVersions = trim(shell_exec("ls -1 \"{$niceName} (\"*\"(v\"* 2>/dev/null"));
     if ($otherVersions)
@@ -205,20 +197,45 @@ foreach ($gameArray as $thisGame)
         $otherVersionArray = explode("\n", $otherVersions);
         foreach ($otherVersionArray as $otherGame)
         {
-            preg_match('%\(v(\d\.\d)\)%', $otherGame, $thisRev);
+            preg_match('%\(v(\d\.\d\d)\)%', $otherGame, $thisRev);
             $thisRev = $thisRev[1];
 
             if (isset($revNum) && $revNum < $thisRev)
             {
                 // Other version is newer, bin ours
                 echo "{$thisGameNoExtension} has an inferior version number [{$revNum} VS. {$thisRev}] - Moved to Removed folder.\n";
-                shell_exec("mv ".escapeshellarg($thisGame)." Removed/");
+                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
                 continue 2;
             }
         }
     }
 
-echo "{$thisGameNoExtension} scanned and kept.\n";
+    // Check for reversions single digits e.g. (v1.1) if no double digits found
+    else
+    {
+        if (preg_match('%\(v(\d\.\d)\)%', $thisGame, $revNum)) $revNum = $revNum[1];
+
+        $otherVersions = trim(shell_exec("ls -1 \"{$niceName} (\"*\"(v\"* 2>/dev/null"));
+        if ($otherVersions)
+        {
+            $otherVersionArray = explode("\n", $otherVersions);
+            foreach ($otherVersionArray as $otherGame)
+            {
+                preg_match('%\(v(\d\.\d)\)%', $otherGame, $thisRev);
+                $thisRev = $thisRev[1];
+
+                if (isset($revNum) && $revNum < $thisRev)
+                {
+                    // Other version is newer, bin ours
+                    echo "{$thisGameNoExtension} has an inferior version number [{$revNum} VS. {$thisRev}] - Moved to Removed folder.\n";
+                    shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+                    continue 2;
+                }
+            }
+        }
+    }
+
+    echo "{$thisGameNoExtension} scanned and kept.\n";
 
     // Move "(Track X)" games to a folder to process
     /*
