@@ -20,7 +20,7 @@ if (file_exists('manualregiondupes.txt'))
         return preg_quote(trim($i) , "/");
     }
     , $manualRegionDupes)) . ')$/';
-    echo "ManualRegeionDupes.txt has been found, ";
+    echo "ManualRegionDupes.txt has been found, ";
     if (trim(file_get_contents('manualregiondupes.txt')) == false)
     {
         echo "but is empty! Continuing without manual region dupes filter.\n";
@@ -56,7 +56,31 @@ if (file_exists('manualdemos.txt'))
 }
 else
 {
-    echo "ManualDemos.txt has NOT been found. Continuing without the manual region dupes filter.\n\n";
+    echo "ManualDemos.txt has NOT been found. Continuing without the manual demos filter.\n\n";
+}
+
+// Make sure what manualothers.txt is doing
+if (file_exists('manualothers.txt'))
+{
+    $manualOthers = file('manualothers.txt', FILE_IGNORE_NEW_LINES);
+    $manualOthersPattern = "/^(?:" . implode("|", array_map(function ($i)
+    {
+        return preg_quote(trim($i) , "/");
+    }
+    , $manualOthers)) . ')$/';
+    echo "ManualOthers.txt has been found, ";
+    if (trim(file_get_contents('manualothers.txt')) == false)
+    {
+        echo "but is empty! Continuing without manual others filter.\n\n";
+    }
+    else
+    {
+        echo "and is NOT empty! Applying the manual others filter.\n\n";
+    }
+}
+else
+{
+    echo "ManualDemos.txt has NOT been found. Continuing without the manual others filter.\n\n";
 }
 
 // Do this magic for every file
@@ -69,7 +93,7 @@ foreach ($gameArray as $thisGame)
     $niceName = trim(preg_replace('%[\(|\[].*%', '', $thisGame));
     $thisGameNoExtension = preg_replace('/\.' . preg_quote(pathinfo($thisGame, PATHINFO_EXTENSION) , '/') . '$/', '', $thisGame);
 
-    // Filenames in manualregiondupes.txt
+    // Filenames in ManualRegionDupes.txt
     if (file_exists('manualregiondupes.txt'))
     {
         if (trim(file_get_contents('manualregiondupes.txt')) == true)
@@ -83,7 +107,7 @@ foreach ($gameArray as $thisGame)
         }
     }
 
-    // Filenames in manualdemos.txt
+    // Filenames in ManualDemos.txt
     if (file_exists('manualdemos.txt'))
     {
         if (trim(file_get_contents('manualdemos.txt')) == true)
@@ -91,6 +115,19 @@ foreach ($gameArray as $thisGame)
             if (preg_match($manualDemosPattern, $thisGameNoExtension))
             {
                 echo "{$thisGameNoExtension} is on the manual demos remove list. Moved to Removed folder.\n";
+                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+                continue;
+            }
+        }
+    }
+
+    // Filenames in ManualOthers.txt
+    {
+        if (trim(file_get_contents('manualothers.txt')) == true)
+        {
+            if (preg_match($manualOthersPattern, $thisGameNoExtension))
+            {
+                echo "{$thisGameNoExtension} is on the manual others remove list. Moved to Removed folder.\n";
                 shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
                 continue;
             }
