@@ -98,7 +98,7 @@ foreach ($gameArray as $thisGame)
     }
 
     // Non-Engish speaking countries e.g. (France) or (Japan)
-    if (preg_match('%\((Asia|Austria|Brazil|China|Denmark|Finland|France|Germany|Greece|Hungary|Israel|Italy|Japan|Japan, Asia|Korea|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|Spain|Sweden)\)%', $thisGame))
+    if (preg_match('%\((Asia|Austria|Austria, Switzerland|Belgium|Belgium, Netherlands|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Israel|Italy|Japan|Japan, Asia|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)\)%', $thisGame))
     {
         echo "{$thisGame} is a foreign language release. Moved to Removed folder.\n";
         shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
