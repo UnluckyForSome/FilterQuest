@@ -143,7 +143,7 @@ foreach ($gameArray as $thisGame)
     }
 
     // Non-full release e.g. (Demo) or (Kiosk)
-    if (preg_match('%\((Demo|Demo \d+|Kiosk|Debug|Unl|Sample|Beta|Beta \d+|Developer Cart|EDC)\)%', $thisGame))
+    if (preg_match('%\((Demo|Demo \d+|Kiosk|Debug|Unl|Review Build|Sample|Beta|Beta \d+|Developer Cart|EDC)\)%', $thisGame))
     {
         echo "{$thisGame} is a non-retail release. Moved to Removed folder.\n";
         shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
