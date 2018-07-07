@@ -4,7 +4,7 @@
 ## Please see https://github.com/unluckyforsome/filterquest for info.
 
 <?php
-$gameList = trim(shell_exec("ls -a -1 -I . -I .. -I Process -I Removed -I filterquest -I manualdemos.txt -I manualregiondupes.txt"));
+$gameList = trim(shell_exec("ls -a -1 -I . -I .. -I Process -I Removed -I filterquest -I manualdemos.txt -I manualregiondupes.txt -I manualothers.txt"));
 $gameArray = explode("\n", $gameList);
 
 shell_exec('mkdir -p Removed');
@@ -47,16 +47,16 @@ if (file_exists('manualdemos.txt'))
     echo "ManualDemos.txt has been found, ";
     if (trim(file_get_contents('manualdemos.txt')) == false)
     {
-        echo "but is empty! Continuing without manual demos filter.\n\n";
+        echo "but is empty! Continuing without manual demos filter.\n";
     }
     else
     {
-        echo "and is NOT empty! Applying the manual demos filter.\n\n";
+        echo "and is NOT empty! Applying the manual demos filter.\n";
     }
 }
 else
 {
-    echo "ManualDemos.txt has NOT been found. Continuing without the manual demos filter.\n\n";
+    echo "ManualDemos.txt has NOT been found. Continuing without the manual demos filter.\n";
 }
 
 // Make sure what manualothers.txt is doing
