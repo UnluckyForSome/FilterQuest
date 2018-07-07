@@ -1,0 +1,20 @@
+Redump Default Filter:
+%d=*(Beta*; %d=*(Debug*; %d=*(Demo*; %d=*(Developer Cart*; %d=*(Kiosk*; %d=*(Proto*; %d=*(Sample*; %d=*(Unl*; %d=*(Asia)*; %d=*(Austria)*; %d=*(Brazil)*; %d=*(China)*; %d=*(Denmark)*; %d=*(Finland)*; %d=*(France)*; %d=*(Germany)*; %d=*(Greece)*; %d=*(Hungary)*; %d=*(Israel)*; %d=*(Italy)*; %d=*(Japan)*; %d=*(Korea)*; %d=*(Netherlands)*; %d=*(Norway)*; %d=*(Poland)*; %d=*(Portugal)*; %d=*(Russia)*; %d=*(Scandinavia)*; %d=*(Spain)*; %d=*(Sweden)*
+
+PS1 Redump Extra:
+%d=*(Beta*; %d=*(Debug*; %d=*(Demo*; %d=*(Developer Cart*; %d=*(Kiosk*; %d=*(Proto*; %d=*(Sample*; %d=*(Unl*; %d=*(Asia)*; %d=*(Austria)*; %d=*(Brazil)*; %d=*(China)*; %d=*(Denmark)*; %d=*(Finland)*; %d=*(France)*; %d=*(Germany)*; %d=*(Greece)*; %d=*(Hungary)*; %d=*(Israel)*; %d=*(Italy)*; %d=*(Japan)*; %d=*(Korea)*; %d=*(Netherlands)*; %d=*(Norway)*; %d=*(Poland)*; %d=*(Portugal)*; %d=*(Russia)*; %d=*(Scandinavia)*; %d=*(Spain)*; %d=*(Sweden)*; %d=*(Japan, Asia)*; %d=*Demo*; %d=*CD Sampler*; %d=*Official UK Playstation*; %d=*Official Playstation*; %d=*Toys R Us Test Drive Promotion*; %d=*(Future)*; %d=*Australian Summer Special*; %d=*Compilation ??*; %d=*Station ? (UK)*; %d=*PS One*; %d=*PSone*; %d=*(Europe)*
+
+PS2 Redump Extra (ADD RETROACTIVELY)
+%d=*(Beta*; %d=*(Debug*; %d=*(Demo*; %d=*(Developer Cart*; %d=*(Kiosk*; %d=*(Preview*; %d=*(Proto*; %d=*(Sample*; %d=*(Unl*; %d=*(Asia)*; %d=*(Austria)*; %d=*(Brazil)*; %d=*(China)*; %d=*(Denmark)*; %d=*(Finland)*; %d=*(France)*; %d=*(Germany)*; %d=*(Greece)*; %d=*(Hungary)*; %d=*(Israel)*; %d=*(Italy)*; %d=*(Japan)*; %d=*(Korea)*; %d=*(Netherlands)*; %d=*(Norway)*; %d=*(Poland)*; %d=*(Portugal)*; %d=*(Russia)*; %d=*(Scandinavia)*; %d=*(Spain)*; %d=*(Sweden)*; %d=*(Japan, Asia)*; %d=*(Europe)*; %d=*(Europe, Australia)*; %d=*(India)*; %d=*(Australia)*;  %d=*(Latin America)*; %d=*(UK)*; %d=*(Belgium)*; %d=*(Austria, Switzerland)*; %d=*(South Africa)*; %d=*(Belgium, Netherlands)*; %d=*(Switzerland)*; %d=*(Croatia)*; %d=*Demo Disc*; %d=*Kiosk*; %d=*Jampack*; %d=*Playstation Underground*;
+
+GC Redump Extra:
+%d=*(Beta*; %d=*(Debug*; %d=*(Demo*; %d=*(Developer Cart*; %d=*(Kiosk*; %d=*(Proto*; %d=*(Sample*; %d=*(Unl*; %d=*(Asia)*; %d=*(Austria)*; %d=*(Brazil)*; %d=*(China)*; %d=*(Denmark)*; %d=*(Finland)*; %d=*(France)*; %d=*(Germany)*; %d=*(Greece)*; %d=*(Hungary)*; %d=*(Israel)*; %d=*(Italy)*; %d=*(Japan)*; %d=*(Korea)*; %d=*(Netherlands)*; %d=*(Norway)*; %d=*(Poland)*; %d=*(Portugal)*; %d=*(Russia)*; %d=*(Scandinavia)*; %d=*(Spain)*; %d=*(Sweden)*; %d=*Demo*; %d=*(Europe)*
+
+No Intro Default Filter:
+%d=*(Beta*; %d=*(Debug*; %d=*(Demo*; %d=*(Developer Cart*; %d=*(Kiosk*; %d=*(Proto*; %d=*(Sample*; %d=*(Unl*
+
+Redump Update Instructions:
+Scan with new dat and compare miss-list with ///
+
+No Intro Update Instructions
+Scan with new XML dat and add any missing roms (should be 100%!)
