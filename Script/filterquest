@@ -122,6 +122,7 @@ foreach ($gameArray as $thisGame)
     }
 
     // Filenames in ManualOthers.txt
+    if (file_exists('manualothers.txt'))
     {
         if (trim(file_get_contents('manualothers.txt')) == true)
         {
@@ -226,27 +227,29 @@ foreach ($gameArray as $thisGame)
     }
 
     // Check for reversions double digits e.g. (v1.01)
-    if (preg_match('%\(v(\d\.\d\d)\)%', $thisGame, $revNum)) $revNum = $revNum[1];
-
-    $otherVersions = trim(shell_exec("ls -1 \"{$niceName} (\"*\"(v\"* 2>/dev/null"));
-    if ($otherVersions)
+    if (preg_match('%\(v(\d\.\d\d)\)%', $thisGame, $revNum))
     {
-        $otherVersionArray = explode("\n", $otherVersions);
-        foreach ($otherVersionArray as $otherGame)
-        {
-            preg_match('%\(v(\d\.\d\d)\)%', $otherGame, $thisRev);
-            $thisRev = $thisRev[1];
+        $revNum = $revNum[1];
 
-            if (isset($revNum) && $revNum < $thisRev)
+        $otherVersions = trim(shell_exec("ls -1 \"{$niceName} (\"*\"(v\"* 2>/dev/null"));
+        if ($otherVersions)
+        {
+            $otherVersionArray = explode("\n", $otherVersions);
+            foreach ($otherVersionArray as $otherGame)
             {
-                // Other version is newer, bin ours
-                echo "{$thisGameNoExtension} has an inferior version number [{$revNum} VS. {$thisRev}] - Moved to Removed folder.\n";
-                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
-                continue 2;
+                preg_match('%\(v(\d\.\d\d)\)%', $otherGame, $thisRev);
+                $thisRev = $thisRev[1];
+
+                if (isset($revNum) && $revNum < $thisRev)
+                {
+                    // Other version is newer, bin ours
+                    echo "{$thisGameNoExtension} has an inferior version number [{$revNum} VS. {$thisRev}] - Moved to Removed folder.\n";
+                    shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+                    continue 2;
+                }
             }
         }
     }
-
     // Check for reversions single digits e.g. (v1.1) if no double digits found
     else
     {
