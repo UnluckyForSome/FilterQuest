@@ -143,8 +143,8 @@ foreach ($gameArray as $thisGame)
         continue;
     }
 
-    // Non-full release e.g. (Demo) or (Kiosk)
-    if (preg_match('%\((Demo|Demo \d+|Kiosk|Debug|Unl|Review Build|Sample|Beta|Beta \d+|Developer Cart|EDC)\)%', $thisGame))
+    // Non-full retail release e.g. (Demo) or (Kiosk)
+    if (preg_match('%\((Beta|Beta \d+|Debug|Demo|Demo \d+|Developer Cart|EDC|Kiosk|Preview|Review Build|Sample|Unl)\)%', $thisGame))
     {
         echo "{$thisGame} is a non-retail release. Moved to Removed folder.\n";
         shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
