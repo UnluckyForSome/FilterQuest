@@ -93,48 +93,6 @@ foreach ($gameArray as $thisGame)
     $niceName = trim(preg_replace('%[\(|\[].*%', '', $thisGame));
     $thisGameNoExtension = preg_replace('/\.' . preg_quote(pathinfo($thisGame, PATHINFO_EXTENSION) , '/') . '$/', '', $thisGame);
 
-    // Filenames in ManualRegionDupes.txt
-    if (file_exists('manualregiondupes.txt'))
-    {
-        if (trim(file_get_contents('manualregiondupes.txt')) == true)
-        {
-            if (preg_match($manualRegionPattern, $thisGameNoExtension))
-            {
-                echo "{$thisGameNoExtension} is on the manual region dupes remove list. Moved to Removed folder.\n";
-                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
-                continue;
-            }
-        }
-    }
-
-    // Filenames in ManualDemos.txt
-    if (file_exists('manualdemos.txt'))
-    {
-        if (trim(file_get_contents('manualdemos.txt')) == true)
-        {
-            if (preg_match($manualDemosPattern, $thisGameNoExtension))
-            {
-                echo "{$thisGameNoExtension} is on the manual demos remove list. Moved to Removed folder.\n";
-                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
-                continue;
-            }
-        }
-    }
-
-    // Filenames in ManualOthers.txt
-    if (file_exists('manualothers.txt'))
-    {
-        if (trim(file_get_contents('manualothers.txt')) == true)
-        {
-            if (preg_match($manualOthersPattern, $thisGameNoExtension))
-            {
-                echo "{$thisGameNoExtension} is on the manual others remove list. Moved to Removed folder.\n";
-                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
-                continue;
-            }
-        }
-    }
-
     // REMOVE Non-Engish speaking countries e.g. (France) or (Japan)
     if (preg_match('%\((Asia|Austria|Austria, Switzerland|Belgium|Belgium, Netherlands|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Israel|Italy|Japan|Japan, Asia|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)\)%', $thisGame))
     {
@@ -176,7 +134,7 @@ foreach ($gameArray as $thisGame)
             continue;
         }
 
-        // Check for USA/Japan version
+        // Check for combined USA version
         $fCheck = trim(shell_exec("ls -1 \"{$niceName} (Japan, USA)\"* 2>/dev/null"));
         if (!$fCheck) $fCheck = trim(shell_exec("ls -1 \"{$niceName} (USA, Korea)\"* 2>/dev/null"));
         if ($fCheck)
@@ -298,6 +256,48 @@ foreach ($gameArray as $thisGame)
                     shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
                     continue 2;
                 }
+            }
+        }
+    }
+
+    // Filenames in ManualRegionDupes.txt
+    if (file_exists('manualregiondupes.txt'))
+    {
+        if (trim(file_get_contents('manualregiondupes.txt')) == true)
+        {
+            if (preg_match($manualRegionPattern, $thisGameNoExtension))
+            {
+                echo "{$thisGameNoExtension} is on the manual region dupes remove list. Moved to Removed folder.\n";
+                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+                continue;
+            }
+        }
+    }
+
+    // Filenames in ManualDemos.txt
+    if (file_exists('manualdemos.txt'))
+    {
+        if (trim(file_get_contents('manualdemos.txt')) == true)
+        {
+            if (preg_match($manualDemosPattern, $thisGameNoExtension))
+            {
+                echo "{$thisGameNoExtension} is on the manual demos remove list. Moved to Removed folder.\n";
+                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+                continue;
+            }
+        }
+    }
+
+    // Filenames in ManualOthers.txt
+    if (file_exists('manualothers.txt'))
+    {
+        if (trim(file_get_contents('manualothers.txt')) == true)
+        {
+            if (preg_match($manualOthersPattern, $thisGameNoExtension))
+            {
+                echo "{$thisGameNoExtension} is on the manual others remove list. Moved to Removed folder.\n";
+                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+                continue;
             }
         }
     }
