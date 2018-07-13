@@ -1,0 +1,320 @@
+#!/bin/php
+##
+## FilterQuest by UnluckyForSome
+## Please see https://github.com/unluckyforsome/filterquest for info.
+
+<?php
+$gameList = trim(shell_exec("ls -a -1 -I . -I .. -I Process -I Removed -I filterquest -I 'filterquestbeta[0-9]' -I manualdemos.txt -I manualregiondupes.txt -I manualothers.txt"));
+$gameArray = explode("\n", $gameList);
+
+shell_exec('mkdir -p Removed');
+/* shell_exec('mkdir -p Process');
+*/
+
+// Make sure what manualregiondupes.txt is doing
+if (file_exists('manualregiondupes.txt'))
+{
+    $manualRegionDupes = file('manualregiondupes.txt', FILE_IGNORE_NEW_LINES);
+    $manualRegionPattern = "/^(?:" . implode("|", array_map(function ($i)
+    {
+        return preg_quote(trim($i) , "/");
+    }
+    , $manualRegionDupes)) . ')$/';
+    echo "ManualRegionDupes.txt has been found, ";
+    if (trim(file_get_contents('manualregiondupes.txt')) == false)
+    {
+        echo "but is empty! Continuing without manual region dupes filter.\n";
+    }
+    else
+    {
+        echo "and is NOT empty! Applying the manual region dupes filter.\n";
+    }
+}
+else
+{
+    echo "ManualRegionDupes.txt has NOT been found. Continuing without the manual region dupes filter.\n";
+}
+
+// Make sure what manualdemos.txt is doing
+if (file_exists('manualdemos.txt'))
+{
+    $manualDemos = file('manualdemos.txt', FILE_IGNORE_NEW_LINES);
+    $manualDemosPattern = "/^(?:" . implode("|", array_map(function ($i)
+    {
+        return preg_quote(trim($i) , "/");
+    }
+    , $manualDemos)) . ')$/';
+    echo "ManualDemos.txt has been found, ";
+    if (trim(file_get_contents('manualdemos.txt')) == false)
+    {
+        echo "but is empty! Continuing without manual demos filter.\n";
+    }
+    else
+    {
+        echo "and is NOT empty! Applying the manual demos filter.\n";
+    }
+}
+else
+{
+    echo "ManualDemos.txt has NOT been found. Continuing without the manual demos filter.\n";
+}
+
+// Make sure what manualothers.txt is doing
+if (file_exists('manualothers.txt'))
+{
+    $manualOthers = file('manualothers.txt', FILE_IGNORE_NEW_LINES);
+    $manualOthersPattern = "/^(?:" . implode("|", array_map(function ($i)
+    {
+        return preg_quote(trim($i) , "/");
+    }
+    , $manualOthers)) . ')$/';
+    echo "ManualOthers.txt has been found, ";
+    if (trim(file_get_contents('manualothers.txt')) == false)
+    {
+        echo "but is empty! Continuing without manual others filter.\n\n";
+    }
+    else
+    {
+        echo "and is NOT empty! Applying the manual others filter.\n\n";
+    }
+}
+else
+{
+    echo "ManualDemos.txt has NOT been found. Continuing without the manual others filter.\n\n";
+}
+
+// Do this magic for every file
+foreach ($gameArray as $thisGame)
+{
+    if (!$thisGame) continue;
+    // Probably already been removed
+    if (!file_exists($thisGame)) continue;
+
+    $niceName = trim(preg_replace('%[\(|\[].*%', '', $thisGame));
+    $thisGameNoExtension = preg_replace('/\.' . preg_quote(pathinfo($thisGame, PATHINFO_EXTENSION) , '/') . '$/', '', $thisGame);
+
+    // REMOVE Non-English speaking countries e.g. (France) or (Japan)
+    if (preg_match('%\((Asia|Austria|Austria, Switzerland|Belgium|Belgium, Netherlands|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Israel|Italy|Japan|Japan, Asia|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)\)%', $thisGame))
+    {
+        echo "{$thisGame} is a foreign release. Moved to Removed folder.\n";
+        shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+        continue;
+    }
+
+    // REMOVE - Non-full retail release e.g. (Demo) or (Kiosk)
+    if (preg_match('%\((Beta|Beta \d+|Debug|Demo|Demo \d+|Developer Cart|EDC|Kiosk|Preview|Review Build|Sample|Unl|Video Demo)\)%', $thisGame))
+    {
+        echo "{$thisGame} is a non-retail release. Moved to Removed folder.\n";
+        shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+        continue;
+    }
+
+    // REMOVE - non-English language versions e.g. (Se,De,Fr)
+    if (preg_match('%\(Europe\).+\(((?:[A-Za-z]{2}[,|\)])+)%', $thisGame, $languageArray))
+    {
+        // Preg match leaves trailing ) so remove it
+        $languageArray = explode(',', str_replace(')', '', trim($languageArray[1])));
+        if (!in_array('En', $languageArray))
+        {
+            echo "{$thisGame} is a non-english language release. Moved to Removed folder.\n";
+            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+            continue;
+        }
+    }
+
+    // PURIFY - (USA) > (USA) (En, Fr) - AKA If scanned USA game has extra languages, check to see if there is a USA version without extra languages (pure), while making sure we're not accidently scanning a USA non-full retail release that hasn't been removed yet in this check.
+    if (strstr($thisGame, '(USA)') && strstr($thisGame, '(En,'))
+    {
+        // Check for (USA) only version without extra languages
+        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (USA)\"* 2>/dev/null | grep -v '([A-Z][a-z],\|(\(Beta\|Beta \d+\|Debug\|Demo\|Demo \d+\|Developer Cart\|EDC\|Kiosk\|Preview\|Review Build\|Sample\|Unl\|Video Demo\))'"));
+        if ($fCheck)
+        {
+            echo "{$thisGame} has a pure USA version available (without extra languages). Moved to Removed folder.\n";
+            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+            continue;
+        }
+    }
+
+    // PURIFY - (UK) > (UK) (En, Fr) - AKA If scanned UK game has extra languages, check to see if there is a UK version without extra languages (pure), while making sure we're not accidently scanning a UK non-full retail release that hasn't been removed yet in this check.
+    if (strstr($thisGame, '(UK)') && strstr($thisGame, '(En,'))
+    {
+        // Check for (UK) only version without extra languages
+        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (UK)\"* 2>/dev/null | grep -v '([A-Z][a-z],\|(\(Beta\|Beta \d+\|Debug\|Demo\|Demo \d+\|Developer Cart\|EDC\|Kiosk\|Preview\|Review Build\|Sample\|Unl\|Video Demo\))'"));
+        if ($fCheck)
+        {
+            echo "{$thisGame} has a pure UK version available (without extra languages). Moved to Removed folder.\n";
+            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+            continue;
+        }
+    }
+
+    // PURIFY - (Europe) > (Europe) (En, Fr) - AKA If current Europe game has extra languages,  check to see if there is a Europe version without extra languages (pure), while making sure we're not accidently scanning a Europe non-full retail release that hasn't been removed yet in this check.
+    if (strstr($thisGame, '(Europe)') && strstr($thisGame, '(En,'))
+    {
+        // Check for (Europe) only version without extra languages
+        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (Europe)\"* 2>/dev/null | grep -v '([A-Z][a-z],\|(\(Beta\|Beta \d+\|Debug\|Demo\|Demo \d+\|Developer Cart\|EDC\|Kiosk\|Preview\|Review Build\|Sample\|Unl\|Video Demo\))'"));
+        if ($fCheck)
+        {
+            echo "{$thisGame} has a pure Europe version available (without extra languages). Moved to Removed folder.\n";
+            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+            continue;
+        }
+    }
+
+    // PRIORITZE - USA > Everything Else - and exclude seeing cruft that hasn't been removed yet! < This is so a Euro game doesn't get deleted if the script sees a (USA) (Demo) game before it gets wiped
+    if (!strstr($thisGame, '(USA)') && !strstr($thisGame, '(Japan, USA)') && !strstr($thisGame, '(USA, Korea)'))
+    {
+        // Check for pure USA only version
+        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (USA)\"* 2>/dev/null | grep -v '\((Beta\|Beta \d+\|Debug\|Demo\|Demo \d+\|Developer Cart\|EDC\|Kiosk\|Preview\|Review Build\|Sample\|Unl\|Video Demo)\)'"));
+        if ($fCheck)
+        {
+            echo "{$thisGame} has a USA version available. Moved to Removed folder.\n";
+            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+            continue;
+        }
+
+        // Check for combined USA version
+        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (Japan, USA)\"* 2>/dev/null"));
+        if (!$fCheck) $fCheck = trim(shell_exec("ls -1 \"{$niceName} (USA, Korea)\"* 2>/dev/null"));
+        if ($fCheck)
+        {
+            echo "{$thisGame} has a semi-USA version available. Moved to Removed folder.\n";
+            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+            continue;
+        }
+    }
+
+    // PRIORITIZE - UK > Everything Else (except USA)
+    if (!strstr($thisGame, '(UK)'))
+    {
+        // Check for pure UK only version
+        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (UK)\"* 2>/dev/null | grep -v '\((Beta\|Beta \d+\|Debug\|Demo\|Demo \d+\|Developer Cart\|EDC\|Kiosk\|Preview\|Review Build\|Sample\|Unl\|Video Demo)\)'"));
+        if ($fCheck)
+        {
+            echo "{$thisGame} has a UK version available. Moved to Removed folder.\n";
+            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+            continue;
+        }
+    }
+
+    // PRIORITIZE - Europe > Everything Else (except USA & UK)
+    if (!strstr($thisGame, '(Europe)'))
+    {
+        // Check for pure Europe only version
+        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (Europe)\"* 2>/dev/null | grep -v '\((Beta\|Beta \d+\|Debug\|Demo\|Demo \d+\|Developer Cart\|EDC\|Kiosk\|Preview\|Review Build\|Sample\|Unl\|Video Demo)\)'"));
+        if ($fCheck)
+        {
+            echo "{$thisGame} has a Europe version available. Moved to Removed folder.\n";
+            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+            continue;
+        }
+    }
+
+    // PRIORITIZE - Reversions e.g. (Rev 2 > Rev 1) or (Rev B > Rev A)
+    if (preg_match('%\(Rev (\d|[A-Za-z])\)%', $thisGame, $revNum))
+    {
+        if (is_numeric($revNum[1]))
+        {
+            $revNum = intval($revNum[1]);
+        }
+        else
+        {
+            $revNum = ord($revNum[1]);
+        }
+    }
+
+    $otherVersions = trim(shell_exec("ls -1 \"{$niceName} (\"*\"(Rev \"* 2>/dev/null"));
+    if ($otherVersions)
+    {
+        $otherVersionArray = explode("\n", $otherVersions);
+        foreach ($otherVersionArray as $otherGame)
+        {
+            preg_match('%\(Rev (\d|[A-Za-z])\)%', $otherGame, $thisRev);
+            if (is_numeric($thisRev[1]))
+            {
+                $thisRev = intval($thisRev[1]);
+            }
+            else
+            {
+                $thisRev = ord($thisRev[1]);
+            }
+
+            if (isset($revNum) && $revNum < $thisRev)
+            {
+                // Other version is newer, bin ours
+                echo "{$thisGame} has an inferior version number [{$revNum} VS. {$thisRev}] - Moved to Removed folder.\n";
+                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+                continue 2;
+            }
+        }
+    }
+
+	// PRIORITIZE - Reversions e.g. (v1.02 > v1.01) or (v1.2 > v1.1)
+	if(preg_match('%\(v(\d+\.\d+)\)%', $thisGame, $revNum)) $revNum = $revNum[1];
+
+	$otherVersions = trim(shell_exec("ls -1 \"{$niceName} (\"*\"(v\"* 2>/dev/null"));
+    if($otherVersions)
+    {
+		$otherVersionArray = explode("\n", $otherVersions);
+        foreach($otherVersionArray as $otherGame)
+        {
+			preg_match('%\(v(\d+\.\d+)\)%', $otherGame, $thisRev);
+			$thisRev = $thisRev[1];
+
+            if(isset($revNum) && $revNum < $thisRev)
+            {
+				// Other version is newer, bin ours
+                echo "{$thisGameNoExtension} has an inferior version number [{$revNum} VS. {$thisRev}] - Moved to Removed folder.\n";
+                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+				continue 2;
+			}
+		}
+	}
+
+    // Filenames in ManualRegionDupes.txt
+    if (file_exists('manualregiondupes.txt'))
+    {
+        if (trim(file_get_contents('manualregiondupes.txt')) == true)
+        {
+            if (preg_match($manualRegionPattern, $thisGameNoExtension))
+            {
+                echo "{$thisGameNoExtension} is on the manual region dupes remove list. Moved to Removed folder.\n";
+                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+                continue;
+            }
+        }
+    }
+
+    // Filenames in ManualDemos.txt
+    if (file_exists('manualdemos.txt'))
+    {
+        if (trim(file_get_contents('manualdemos.txt')) == true)
+        {
+            if (preg_match($manualDemosPattern, $thisGameNoExtension))
+            {
+                echo "{$thisGameNoExtension} is on the manual demos remove list. Moved to Removed folder.\n";
+                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+                continue;
+            }
+        }
+    }
+
+    // Filenames in ManualOthers.txt
+    if (file_exists('manualothers.txt'))
+    {
+        if (trim(file_get_contents('manualothers.txt')) == true)
+        {
+            if (preg_match($manualOthersPattern, $thisGameNoExtension))
+            {
+                echo "{$thisGameNoExtension} is on the manual others remove list. Moved to Removed folder.\n";
+                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+                continue;
+            }
+        }
+    }
+
+    echo "{$thisGameNoExtension} scanned and kept.\n";
+
+}
+echo "\nProcess complete!";
+?>

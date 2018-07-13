@@ -4,7 +4,7 @@
 ## Please see https://github.com/unluckyforsome/filterquest for info.
 
 <?php
-$gameList = trim(shell_exec("ls -a -1 -I . -I .. -I Process -I Removed -I filterquest -I manualdemos.txt -I manualregiondupes.txt -I manualothers.txt"));
+$gameList = trim(shell_exec("ls -a -1 -I . -I .. -I Process -I Removed -I filterquest -I filterquestbeta -I manualdemos.txt -I manualregiondupes.txt -I manualothers.txt"));
 $gameArray = explode("\n", $gameList);
 
 shell_exec('mkdir -p Removed');
@@ -96,12 +96,12 @@ foreach ($gameArray as $thisGame)
     // REMOVE Non-Engish speaking countries e.g. (France) or (Japan)
     if (preg_match('%\((Asia|Austria|Austria, Switzerland|Belgium|Belgium, Netherlands|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Israel|Italy|Japan|Japan, Asia|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)\)%', $thisGame))
     {
-        echo "{$thisGame} is a foreign language release. Moved to Removed folder.\n";
+        echo "{$thisGame} is a foreign release. Moved to Removed folder.\n";
         shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
         continue;
     }
 
-    // REMOVE Non-full retail release e.g. (Demo) or (Kiosk)
+    // REMOVE - Non-full retail release e.g. (Demo) or (Kiosk)
     if (preg_match('%\((Beta|Beta \d+|Debug|Demo|Demo \d+|Developer Cart|EDC|Kiosk|Preview|Review Build|Sample|Unl)\)%', $thisGame))
     {
         echo "{$thisGame} is a non-retail release. Moved to Removed folder.\n";
@@ -109,27 +109,66 @@ foreach ($gameArray as $thisGame)
         continue;
     }
 
-    // REMOVE non-English language versions e.g. (Se,De,Fr)
+    // REMOVE - non-English language versions e.g. (Se,De,Fr)
     if (preg_match('%\(Europe\).+\(((?:[A-Za-z]{2}[,|\)])+)%', $thisGame, $languageArray))
     {
         // Preg match leaves trailing ) so remove it
         $languageArray = explode(',', str_replace(')', '', trim($languageArray[1])));
         if (!in_array('En', $languageArray))
         {
-            echo "{$thisGame} is a non-english euro release. Moved to Removed folder.\n";
+            echo "{$thisGame} is a non-english language release. Moved to Removed folder.\n";
             shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
             continue;
         }
     }
 
-    // PRIORITZE - USA > Everything Else
+    // PURIFY - (USA) > (USA) (En, Fr) - AKA If scanned USA game has extra languages, check to see if there is a USA version without extra languages (pure), while making sure we're not accidently scanning a USA non-full retail release that hasn't been removed yet in this check.
+    if (strstr($thisGame, '(USA)') && strstr($thisGame, '(En,'))
+    {
+        // Check for (USA) only version without extra languages
+        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (USA)\"* 2>/dev/null | grep -v '([A-Z][a-z],\|(\(Beta\|Beta \d+\|Debug\|Demo\|Demo \d+\|Developer Cart\|EDC\|Kiosk\|Preview\|Review Build\|Sample\|Unl\))'"));
+        if ($fCheck)
+        {
+            echo "{$thisGame} has a pure USA version available (without extra languages). Moved to Removed folder.\n";
+            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+            continue;
+        }
+    }
+
+    // PURIFY - (UK) > (UK) (En, Fr) - AKA If scanned UK game has extra languages, check to see if there is a UK version without extra languages (pure), while making sure we're not accidently scanning a UK non-full retail release that hasn't been removed yet in this check.
+    if (strstr($thisGame, '(UK)') && strstr($thisGame, '(En,'))
+    {
+        // Check for (UK) only version without extra languages
+        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (UK)\"* 2>/dev/null | grep -v '([A-Z][a-z],\|(\(Beta\|Beta \d+\|Debug\|Demo\|Demo \d+\|Developer Cart\|EDC\|Kiosk\|Preview\|Review Build\|Sample\|Unl\))'"));
+        if ($fCheck)
+        {
+            echo "{$thisGame} has a pure UK version available (without extra languages). Moved to Removed folder.\n";
+            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+            continue;
+        }
+    }
+
+    // PURIFY - (Europe) > (Europe) (En, Fr) - AKA If current Europe game has extra languages,  check to see if there is a Europe version without extra languages (pure), while making sure we're not accidently scanning a Europe non-full retail release that hasn't been removed yet in this check.
+    if (strstr($thisGame, '(Europe)') && strstr($thisGame, '(En,'))
+    {
+        // Check for (Europe) only version without extra languages
+        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (Europe)\"* 2>/dev/null | grep -v '([A-Z][a-z],\|(\(Beta\|Beta \d+\|Debug\|Demo\|Demo \d+\|Developer Cart\|EDC\|Kiosk\|Preview\|Review Build\|Sample\|Unl\))'"));
+        if ($fCheck)
+        {
+            echo "{$thisGame} has a pure Europe version available (without extra languages). Moved to Removed folder.\n";
+            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+            continue;
+        }
+    }
+
+    // PRIORITZE - USA > Everything Else - and exclude seeing cruft that hasn't been removed yet! < This is so a Euro game doesn't get deleted if the script sees a (USA) (Demo) game before it gets wiped
     if (!strstr($thisGame, '(USA)') && !strstr($thisGame, '(Japan, USA)') && !strstr($thisGame, '(USA, Korea)'))
     {
         // Check for pure USA only version
-        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (USA)\"* 2>/dev/null"));
+        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (USA)\"* 2>/dev/null | grep -v '\((Beta\|Beta \d+\|Debug\|Demo\|Demo \d+\|Developer Cart\|EDC\|Kiosk\|Preview\|Review Build\|Sample\|Unl)\)'"));
         if ($fCheck)
         {
-            echo "{$thisGame} has a pure USA version available. Keeping that instead. Moved to Removed folder.\n";
+            echo "{$thisGame} has a USA version available. Moved to Removed folder.\n";
             shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
             continue;
         }
@@ -139,7 +178,7 @@ foreach ($gameArray as $thisGame)
         if (!$fCheck) $fCheck = trim(shell_exec("ls -1 \"{$niceName} (USA, Korea)\"* 2>/dev/null"));
         if ($fCheck)
         {
-            echo "{$thisGame} has a semi-USA version available. Keeping that instead. Moved to Removed folder.\n";
+            echo "{$thisGame} has a semi-USA version available. Moved to Removed folder.\n";
             shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
             continue;
         }
@@ -149,23 +188,23 @@ foreach ($gameArray as $thisGame)
     if (!strstr($thisGame, '(UK)'))
     {
         // Check for pure UK only version
-        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (UK)\"* 2>/dev/null"));
+        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (UK)\"* 2>/dev/null | grep -v '\((Beta\|Beta \d+\|Debug\|Demo\|Demo \d+\|Developer Cart\|EDC\|Kiosk\|Preview\|Review Build\|Sample\|Unl)\)'"));
         if ($fCheck)
         {
-            echo "{$thisGame} has a pure UK version available. Keeping that instead. Moved to Removed folder.\n";
+            echo "{$thisGame} has a UK version available. Moved to Removed folder.\n";
             shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
             continue;
         }
     }
 
-    // PRIORITIZE - EUROPE > Everything Else (except USA & UK)
+    // PRIORITIZE - Europe > Everything Else (except USA & UK)
     if (!strstr($thisGame, '(Europe)'))
     {
-        // Check for pure EUROPE only version
-        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (Europe)\"* 2>/dev/null"));
+        // Check for pure Europe only version
+        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (Europe)\"* 2>/dev/null | grep -v '\((Beta\|Beta \d+\|Debug\|Demo\|Demo \d+\|Developer Cart\|EDC\|Kiosk\|Preview\|Review Build\|Sample\|Unl)\)'"));
         if ($fCheck)
         {
-            echo "{$thisGame} has a pure Europe version available. Keeping that instead. Moved to Removed folder.\n";
+            echo "{$thisGame} has a Europe version available. Moved to Removed folder.\n";
             shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
             continue;
         }
