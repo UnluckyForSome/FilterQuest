@@ -17,8 +17,8 @@ This includes demos, unlicensed games, betas and much more - e.g. "Game (Beta)".
  - Regions
 If you have several versions of the same game with different regions, FilterQuest will prioritize in the order: USA > Europe > UK > Australia > Everything Else! - e.g. if "Game (USA)" exists "Game (Europe)" will be removed. This also covers combined regions - e.g. if "Game (USA, Brazil)" exists, "Game (Europe)" will be removed.
  
- - Languages
-Versions of the same game with fewer languages will be prioritized - e.g. if "Game (Europe)" exists "Game (Europe) (En,De,Fr)" will be removed. Different versions with the same amount of languages will be evaluated for the best languages possible - e.g. if "Game (Europe) (En,Fr,De)" exists "Game (Europe) (Pt,Sv,Ru)" will be removed.
+ - Fewer Languages
+Versions of the same game with fewer languages will be prioritized - e.g. if "Game (Europe)" exists "Game (Europe) (En,De,Fr)" will be removed. Different versions with the same amount of languages will be evaluated for the best languages possible - e.g. if "Game (Europe) (En,Fr,De)" exists "Game (Europe) (Pt,Sv,Ru)" will be removed. A newer version will be prioritized over less languages.
 
 - Versions & Reversions
 Lower versions of the same game will be removed - e.g. if "Game (USA) (v1.2)" exists "Game (USA) (v1.1)" will be removed. If "Game (USA) (Rev A)" exists "Game (USA) (Rev B)" will be removed.
