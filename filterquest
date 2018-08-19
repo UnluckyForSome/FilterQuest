@@ -10,6 +10,7 @@ echo "\033[00;32mContinue? (y/n): \n\033[0m";
 $stdin = fopen('php://stdin', 'r');
 $response = fgetc($stdin);
 if ($response != 'y') // Start her up!
+
 {
     echo "\033[31mAborted.\n\033[0m";
     exit;
@@ -18,18 +19,18 @@ else
 {
     echo "\033[32m\n\n\033[0m";
 }
-
 // --------------------------------------------------START BEGINNING PHASE-------------------------------------------------- //
 $parentDirectory = dirname(__FILE__); // Get directory that FilterQuest is inside
 chdir('../'); // Go up a directory
 if (!file_exists('Removed/Logs')) // Check if folder structure already exists
+
 {
     mkdir('Removed/Logs', 0777, true); // Create folder structure
+    
 }
 array_map('unlink', glob("Removed/Logs/*.csv")); // Remove old logs
 $anythingManual = false; // Declare manual switch as false before we start
 // --------------------------------------------------START BEGINNING PHASE-------------------------------------------------- //
-
 echo "\033[00;32mTo enable FilterQuest's built-in manual filters, please type the name of the system you are filtering games for. Alternatively, hit enter to continue without any manual filters.\n\n\033[0m";
 echo "\033[00;32mSystem? (ps1/ps2/dc/gc/wii/other): \033[0m";
 $phpSTDIN = fopen("php://stdin", "r");
@@ -63,7 +64,6 @@ if (trim(strtoupper($userResponse)) == '')
     echo "[None Selected]\n\n";
 }
 fclose($phpSTDIN);
-
 if (isset($selectedConsole))
 {
     // Initialize ManualRegionDupes.csv
@@ -121,7 +121,6 @@ if (isset($selectedConsole))
         echo "\033[31m{$selectedConsole}'s ManualOthers.csv has NOT been found. Continuing without the Manual Others filter.\n\033[0m";
     }
 }
-
 // --------------------------------------------------START INTERMEDIATE PHASE-------------------------------------------------- //
 echo "\033[32;4;5m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Starting Process >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n\033[0m";
 echo "\033[32;4;5m\nStarting Pass 1: Removing foreign releases and non-full retail releases.\n\n\033[0m";
@@ -134,8 +133,10 @@ foreach ($fileArray as $thisGame)
     if (!$thisGame) continue; // Ensure continue if already removed
     if (!file_exists($thisGame)) continue; // Ensure continue if already removed
     if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
+    
     {
         $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
+        
     }
     else
     {
@@ -223,8 +224,10 @@ foreach ($fileArray as $thisGame)
     if (!$thisGame) continue; // Ensure continue if already removed
     if (!file_exists($thisGame)) continue; // Ensure continue if already removed
     if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
+    
     {
         $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
+        
     }
     else
     {
@@ -379,8 +382,10 @@ foreach ($fileArray as $thisGame)
     if (!$thisGame) continue; // Ensure continue if already removed
     if (!file_exists($thisGame)) continue; // Ensure continue if already removed
     if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
+    
     {
         $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
+        
     }
     else
     {
@@ -533,8 +538,10 @@ foreach ($fileArray as $thisGame)
     if (!$thisGame) continue; // Ensure continue if already removed
     if (!file_exists($thisGame)) continue; // Ensure continue if already removed
     if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
+    
     {
         $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
+        
     }
     else
     {
@@ -668,8 +675,10 @@ if ($anythingManual == true)
         if (!$thisGame) continue; // Ensure continue if already removed
         if (!file_exists($thisGame)) continue; // Ensure continue if already removed
         if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
+        
         {
             $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
+            
         }
         else
         {
@@ -788,6 +797,7 @@ if ($anythingManual == true)
     // --------------------------------------------------START OPTIONAL INTERMEDIATE PHASE-------------------------------------------------- //
     echo "\033[32;4;5m\nPass 5 Complete!\033[0m";
     // --------------------------------------------------END OPTIONAL INTERMEDIATE PHASE-------------------------------------------------- //
+    
 }
 else
 {
