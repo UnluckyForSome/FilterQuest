@@ -1,27 +1,44 @@
 # FilterQuest
-Filterquest is a powerful script which can take any game directory and remove region duplicates (prioritising USA releases), foreign language and non-retail release games, leaving you only the good stuff!
+Filterquest is a powerful script which uses the No-Intro and Redump naming conventions to filter out any potential games which you wouldn't want, saving you space on your drives and giving you more clarity within your collections.
+
+## Results
+Filterquest **won't delete any files**. The script will output a folder named "Removed" in which all the filtered games which FilterQuest thinks you don't want will be moved. You can easily recover your original collection by moving these files back into the original folder.
+
+### FilterQuest will filter:
+ - Foreign releases:
+Any game which isn't from an English-speaking country - e.g "Game (Japan)".
+ 
+ - Foreign languages:
+English only! Any games in a foreign language will be removed - e.g "Game (Europe) (Fr,De,Es)".
+ 
+ - Non-full-retail reases:
+This includes demos, unlicensed games, betas and much more - e.g "Game (Beta)".
+ 
+ - Regions
+If you have several versions of the same game with different regions, Filterquest will prioritize in the order: USA > Europe > UK > Australia > Everything Else! - e.g if "Game (USA)" exists "Game (Europe)" will be removed. This also covers combined regions - e.g if "Game (USA, Brazil)" exists, "Game (Europe)" will be removed.
+ 
+ - Languages
+Versions of the same game with fewer languages will be prioritized - e.g if "Game (Europe)" exists "Game (Europe) (En,De,Fr)" will be removed. Different versions with the same amount of languages will be evaluated for the best languages possible - e.g if "Game (Europe) (En,Fr,De)" exists "Game (Europe) (Pt,Sv,Ru)" will be removed.
+
+- Versions & Reversions
+Lower versions of the same game will be removed - e.g if "Game (USA) (v1.2)" exists "Game (USA) (v1.1)" will be removed. If "Game (USA) (Rev A)" exists "Game (USA) (Rev B)" will be removed.
+
+- Manual Region Duplicates
+Not all games have the same names in different regions and so can't automatically be filtered. To tackle this, Filterquest has reguarly updated built in "lists" which it uses to identify that a "primary" game is present and then subsequently removes the region duplicate. If no primary version is present it is left alone.
+
+- Manual Demos
+Uses a manual "list" to identify demos which for one reason or another haven't been marked with the "(Demo)" tag in the filename - e.g "Best Games Ever 1"
+
+- Manual Others
+Uses a manual "list" to identify games in the full redump collections which aren't really playable and are more "utilities" - e.g "Network Access Disc"
+
+
 
 ## Prerequesits
 Filterquest is a PHP script which requires a POSIX environment with PHP installed. On Windows, this is most easily achieved by installing Cygwin (https://www.cygwin.com/) with PHP checked during installation. On Linux, you'll just need to make sure you have PHP installed.
 
-FilterQuest relies on games being named in the popular ReDump/TOSEC naming conventions, for example "Crash Team Racing (USA)". These games must all be in the same directory.
+FilterQuest relies on games being named in the popular Redump/No-Intro naming conventions, for example "Game (USA)". These games must all be in the same directory.
 
 ## Usage
-On Windows, place the "filterquest" script file into the same directory of the files you want to filter, then using the Cygwin Terminal navigate to the same directory and use `php filterquest` to run.
+On Windows, download and place the entire "FilterQuest" directory into the same directory as your games, then using the Cygwin Terminal navigate to the same directory and use `php FilterQuest` to run. On Linux use the same method except use the Linux Terminal. Filterquest will create a "Removed" folder in your games directory in which it will put all the games it thinks need removing. If manual lists are used, a "Logs" folder will also be created within the "Removed" folder with logs of what has been removed in regards to the manual lists. Remember, FilterQuest is looking for games one directory up from where it is run from, so make sure you paste the FilterQuest folder and not just all the files!
 
-On Linux use the same method except use the Linux Terminal ;-)
-
-## Results
-Filterquest **won't delete any files**. The script will output a folder named "Removed" in which all the filtered games which FilterQuest thinks you don't need will be moved. You can easily recover your original collection by moving these files back into the original folder.
-
-### Filterquest will filter:
- - Region Duplicates - USA will take priority, if a USA version of a game exists any other region will be removed.
-
- - Inferior versions:
-Lower versions of the same game will be removed. For example Crash Team Racing (USA) (v1.0) will be removed if Crash Team Racing (USA) (v1.1) exists.
-
- - Foreign language releases
-English only! Any games in a foreign language will be removed.
-
- - Non-retail releases
-Demos, unlicensed games and betas will all be removed.
