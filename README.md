@@ -35,7 +35,7 @@ Uses a manual "list" to identify games in the full redump collections which aren
 
 
 ## Prerequesits
-- Filterquest is a PHP script which requires a POSIX environment with PHP installed. On Windows, this is most easily achieved by installing Cygwin (https://www.cygwin.com/) with PHP checked during installation. On Linux, you'll just need to make sure you have PHP installed.
+- Filterquest is a PHP script which requires a POSIX environment with PHP installed. On Windows, this is most easily achieved by installing [Cygwin](https://www.cygwin.com/) with PHP checked during installation. On Linux, you'll just need to make sure you have PHP installed.
 
 - FilterQuest relies on games being named in the popular Redump/No-Intro naming conventions, for example "Game (USA)". These games must all be in the same directory.
 
