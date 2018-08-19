@@ -22,10 +22,8 @@ else
 $parentDirectory = dirname(__FILE__); // Get directory that FilterQuest is inside
 chdir('../'); // Go up a directory
 if (!file_exists('Removed/Logs')) // Check if folder structure already exists
-
 {
     mkdir('Removed/Logs', 0777, true); // Create folder structure
-    
 }
 array_map('unlink', glob("Removed/Logs/*.csv")); // Remove old logs
 $anythingManual = false; // Declare manual switch as false before we start
