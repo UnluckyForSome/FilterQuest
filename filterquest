@@ -7,9 +7,9 @@
 <?php
 echo "\033[00;32mWelcome! FilterQuest will loop through the folder it's directory is in and move any duplicates it finds into a seperate folder. On large collections this can take up to 20 minutes due to multiple passes (we have to be thorough!). No files will be deleted.\n\n\033[0m";
 echo "\033[00;32mContinue? (y/n): \n\033[0m";
-$stdin = fopen('php://stdin', 'r');
-$response = fgetc($stdin);
-if ($response != 'y') // Start her up!
+$phpSTDIN = fopen("php://stdin", "r");
+$userResponse = fgetc($phpSTDIN);
+if (strtoupper($userResponse) != 'Y') // Start her up!
 {
     echo "\033[31mAborted.\n\033[0m";
     exit;
@@ -199,7 +199,7 @@ foreach ($fileArray as $thisGame)
         continue;
     }
     // REMOVE - non-full retail release e.g. "(Demo)", "(Kiosk)"
-    if (preg_match('/\((Beta|Beta \d+|Debug|Demo|Demo \d+|Developer Cart|EDC|Kiosk|Preview|Review|Review Build|Sample|Unl|\+|Video Demo)\)/', $thisGame, $thisGameMatches))
+    if (preg_match('/\((Beta|Beta \d+|Debug|Demo|Demo \d+|Developer Cart|EDC|Kiosk|Preview|Review|Review Build|Sample|Unl|Video Demo)\)/', $thisGame, $thisGameMatches))
     {
         echo "\033[00;36mnon-retail release detected: \033[01;34m{$thisGameMatches[0]}\033[00;36m - Moved to Removed folder.\n\033[0m";
         rename("$thisGame", "Removed/$thisGame");
