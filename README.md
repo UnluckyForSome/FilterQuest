@@ -5,13 +5,13 @@ FilterQuest is a powerful script which uses the No-Intro and Redump naming conve
 FilterQuest **won't delete any files**. The script will output a folder named "Removed" in which all the filtered games which FilterQuest thinks you don't want will be moved. You can easily recover your original collection by moving these files back into the original folder.
 
 ### FilterQuest will filter:
- - **Foreign releases:**
+ - **Foreign Releases:**
  Any game which isn't from an English-speaking country - e.g. "Game (Japan)".
  
- - **Foreign languages:**
+ - **Foreign Languages:**
  English only! Any games in a foreign language will be removed - e.g. "Game (Europe) (Fr,De,Es)".
  
- - **Non-full-retail releases:**
+ - **Non-full-retail Releases:**
  This includes demos, unlicensed games, betas and much more - e.g. "Game (Beta)".
  
  - **Regions:**
