@@ -6,39 +6,30 @@ FilterQuest **won't delete any files**. The script will output a folder named "R
 
 ### FilterQuest will filter:
  - **Foreign releases:**
- 
-Any game which isn't from an English-speaking country - e.g. "Game (Japan)".
+ Any game which isn't from an English-speaking country - e.g. "Game (Japan)".
  
  - **Foreign languages:**
- 
-English only! Any games in a foreign language will be removed - e.g. "Game (Europe) (Fr,De,Es)".
+ English only! Any games in a foreign language will be removed - e.g. "Game (Europe) (Fr,De,Es)".
  
  - **Non-full-retail releases:**
- 
-This includes demos, unlicensed games, betas and much more - e.g. "Game (Beta)".
+ This includes demos, unlicensed games, betas and much more - e.g. "Game (Beta)".
  
  - **Regions:**
- 
-If you have several versions of the same game with different regions, FilterQuest will prioritize in the order: USA > Europe > UK > Australia > Everything Else! - e.g. if "Game (USA)" exists "Game (Europe)" will be removed. This also covers combined regions - e.g. if "Game (USA, Brazil)" exists, "Game (Europe)" will be removed.
+ If you have several versions of the same game with different regions, FilterQuest will prioritize in the order: USA > Europe > UK > Australia > Everything Else! - e.g. if "Game (USA)" exists "Game (Europe)" will be removed. This also covers combined regions - e.g. if "Game (USA, Brazil)" exists, "Game (Europe)" will be removed.
  
  - **Fewer Languages:**
- 
-Versions of the same game with fewer languages will be prioritized - e.g. if "Game (Europe)" exists "Game (Europe) (En,De,Fr)" will be removed. Different versions with the same amount of languages will be evaluated for the best languages possible - e.g. if "Game (Europe) (En,Fr,De)" exists "Game (Europe) (Pt,Sv,Ru)" will be removed. A newer version will be prioritized over less languages.
+ Versions of the same game with fewer languages will be prioritized - e.g. if "Game (Europe)" exists "Game (Europe) (En,De,Fr)" will be removed. Different versions with the same amount of languages will be evaluated for the best languages possible - e.g. if "Game (Europe) (En,Fr,De)" exists "Game (Europe) (Pt,Sv,Ru)" will be removed. A newer version will be prioritized over less languages.
 
 - **Versions & Reversions:**
-
 Lower versions of the same game will be removed - e.g. if "Game (USA) (v1.2)" exists "Game (USA) (v1.1)" will be removed. If "Game (USA) (Rev A)" exists "Game (USA) (Rev B)" will be removed.
 
 - **Manual Region Duplicates:**
-
 Not all games have the same names in different regions and so can't automatically be filtered. To tackle this, FilterQuest has regularly updated built in "[lists](https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pubhtml?gid=1464817576#)" which it uses to identify that a "primary" game is present and then subsequently removes the region duplicate. If no primary version is present it is left alone. You can view these lists with the link above.
 
 - **Manual Demos:**
-
 Uses a manual "list" to identify demos which for one reason or another haven't been marked with the "(Demo)" tag in the filename - e.g. "Best Games Ever 1"
 
 - **Manual Others:**
-
 Uses a manual "list" to identify games in the full Redump collections which aren't really playable and are more "utilities" - e.g. "Network Access Disc"
 
 ## Prerequisites
