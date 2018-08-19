@@ -8,5 +8,3 @@ Dreamkey Version 3.0 (Europe) (En,Fr,De,It)
 Web Browser (USA)
 Web Browser (USA) (Rev A)
 Web Browser 2.0 with SegaNet (USA)
-
-Hydro Thunder (USA)

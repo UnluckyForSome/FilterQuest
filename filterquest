@@ -1,291 +1,793 @@
 #!/bin/php
 ##
 ## FilterQuest by UnluckyForSome
-## Please see https://github.com/unluckyforsome/filterquest for info.
+## FilterQuest looks best in full screen!
+## Please see https://github.com/unluckyforsome/filterquest for more info.
 
 <?php
-$gameList = trim(shell_exec("ls -a -1 -I . -I .. -I Process -I Removed -I filterquest -I manualdemos.txt -I manualregiondupes.txt -I manualothers.txt"));
-$gameArray = explode("\n", $gameList);
-
-shell_exec('mkdir -p Removed');
-/* shell_exec('mkdir -p Process');
-*/
-
-// Make sure what manualregiondupes.txt is doing
-if (file_exists('manualregiondupes.txt'))
+echo "\033[00;32mWelcome! FilterQuest will loop through the folder it's directory is in and move any duplicates it finds into a seperate folder. On large collections this can take up to 20 minutes due to multiple passes (we have to be thorough!). No files will be deleted.\n\n\033[0m";
+echo "\033[00;32mContinue? (y/n): \n\033[0m";
+$stdin = fopen('php://stdin', 'r');
+$response = fgetc($stdin);
+if ($response != 'y') // Start her up!
 {
-    $manualRegionDupes = file('manualregiondupes.txt', FILE_IGNORE_NEW_LINES);
-    $manualRegionPattern = "/^(?:" . implode("|", array_map(function ($i)
-    {
-        return preg_quote(trim($i) , "/");
-    }
-    , $manualRegionDupes)) . ')$/';
-    echo "ManualRegionDupes.txt has been found, ";
-    if (trim(file_get_contents('manualregiondupes.txt')) == false)
-    {
-        echo "but is empty! Continuing without manual region dupes filter.\n";
-    }
-    else
-    {
-        echo "and is NOT empty! Applying the manual region dupes filter.\n";
-    }
+    echo "\033[31mAborted.\n\033[0m";
+    exit;
 }
 else
 {
-    echo "ManualRegionDupes.txt has NOT been found. Continuing without the manual region dupes filter.\n";
+    echo "\033[32m\n\n\033[0m";
 }
-
-// Make sure what manualdemos.txt is doing
-if (file_exists('manualdemos.txt'))
+echo "\033[00;32mTo enable FilterQuest's built-in manual filters, please type the name of the system you are filtering games for. Alternatively, hit enter to continue without any manual filters.\n\n\033[0m";
+echo "\033[00;32mSystem? (ps1/ps2/dc/gc/wii/other): \033[0m";
+$phpSTDIN = fopen("php://stdin", "r");
+$userResponse = fgets($phpSTDIN);
+if (trim(strtoupper($userResponse)) == 'PS1')
 {
-    $manualDemos = file('manualdemos.txt', FILE_IGNORE_NEW_LINES);
-    $manualDemosPattern = "/^(?:" . implode("|", array_map(function ($i)
-    {
-        return preg_quote(trim($i) , "/");
-    }
-    , $manualDemos)) . ')$/';
-    echo "ManualDemos.txt has been found, ";
-    if (trim(file_get_contents('manualdemos.txt')) == false)
-    {
-        echo "but is empty! Continuing without manual demos filter.\n";
-    }
-    else
-    {
-        echo "and is NOT empty! Applying the manual demos filter.\n";
-    }
+    $selectedConsole = "PS1";
 }
-else
+if (trim(strtoupper($userResponse)) == 'PS2')
 {
-    echo "ManualDemos.txt has NOT been found. Continuing without the manual demos filter.\n";
+    $selectedConsole = "PS2";
 }
-
-// Make sure what manualothers.txt is doing
-if (file_exists('manualothers.txt'))
+if (trim(strtoupper($userResponse)) == 'DC')
 {
-    $manualOthers = file('manualothers.txt', FILE_IGNORE_NEW_LINES);
-    $manualOthersPattern = "/^(?:" . implode("|", array_map(function ($i)
-    {
-        return preg_quote(trim($i) , "/");
-    }
-    , $manualOthers)) . ')$/';
-    echo "ManualOthers.txt has been found, ";
-    if (trim(file_get_contents('manualothers.txt')) == false)
-    {
-        echo "but is empty! Continuing without manual others filter.\n\n";
-    }
-    else
-    {
-        echo "and is NOT empty! Applying the manual others filter.\n\n";
-    }
+    $selectedConsole = "DC";
 }
-else
+if (trim(strtoupper($userResponse)) == 'GC')
 {
-    echo "ManualDemos.txt has NOT been found. Continuing without the manual others filter.\n\n";
+    $selectedConsole = "GC";
 }
-
-// Do this magic for every file
-foreach ($gameArray as $thisGame)
+if (trim(strtoupper($userResponse)) == 'WII')
 {
-    if (!$thisGame) continue;
-    // Probably already been removed
-    if (!file_exists($thisGame)) continue;
+    $selectedConsole = "WII";
+}
+if (trim(strtoupper($userResponse)) == 'OTHER')
+{
+    $selectedConsole = "OTHER";
+}
+if (trim(strtoupper($userResponse)) == '')
+{
+    echo "[None Selected]\n\n";
+}
+fclose($phpSTDIN);
 
-    $niceName = trim(preg_replace('%[\(|\[].*%', '', $thisGame));
-    $thisGameNoExtension = preg_replace('/\.' . preg_quote(pathinfo($thisGame, PATHINFO_EXTENSION) , '/') . '$/', '', $thisGame);
-
-    // Filenames in ManualRegionDupes.txt
-    if (file_exists('manualregiondupes.txt'))
+if (isset($selectedConsole))
+{
+    // Initialize ManualRegionDupes.csv
+    if (file_exists("FilterQuest/Manual/{$selectedConsole}/ManualRegionDupes.csv"))
     {
-        if (trim(file_get_contents('manualregiondupes.txt')) == true)
+        echo "\033[32m{$selectedConsole}'s ManualRegionDupes.csv has been found, \033[0m";
+        if (trim(file_get_contents("FilterQuest/Manual/{$selectedConsole}/ManualRegionDupes.csv")) == false)
         {
-            if (preg_match($manualRegionPattern, $thisGameNoExtension))
-            {
-                echo "{$thisGameNoExtension} is on the manual region dupes remove list. Moved to Removed folder.\n";
-                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
-                continue;
-            }
-        }
-    }
-
-    // Filenames in ManualDemos.txt
-    if (file_exists('manualdemos.txt'))
-    {
-        if (trim(file_get_contents('manualdemos.txt')) == true)
-        {
-            if (preg_match($manualDemosPattern, $thisGameNoExtension))
-            {
-                echo "{$thisGameNoExtension} is on the manual demos remove list. Moved to Removed folder.\n";
-                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
-                continue;
-            }
-        }
-    }
-
-    // Filenames in ManualOthers.txt
-    if (file_exists('manualothers.txt'))
-    {
-        if (trim(file_get_contents('manualothers.txt')) == true)
-        {
-            if (preg_match($manualOthersPattern, $thisGameNoExtension))
-            {
-                echo "{$thisGameNoExtension} is on the manual others remove list. Moved to Removed folder.\n";
-                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
-                continue;
-            }
-        }
-    }
-
-    // Non-Engish speaking countries e.g. (France) or (Japan)
-    if (preg_match('%\((Asia|Austria|Austria, Switzerland|Belgium|Belgium, Netherlands|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Israel|Italy|Japan|Japan, Asia|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)\)%', $thisGame))
-    {
-        echo "{$thisGame} is a foreign language release. Moved to Removed folder.\n";
-        shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
-        continue;
-    }
-
-    // Non-full retail release e.g. (Demo) or (Kiosk)
-    if (preg_match('%\((Beta|Beta \d+|Debug|Demo|Demo \d+|Developer Cart|EDC|Kiosk|Preview|Review Build|Sample|Unl)\)%', $thisGame))
-    {
-        echo "{$thisGame} is a non-retail release. Moved to Removed folder.\n";
-        shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
-        continue;
-    }
-
-    // A USA version exists instead, use that
-    if (!strstr($thisGame, '(USA)') && !strstr($thisGame, '(Japan, USA)') && !strstr($thisGame, '(USA, Korea)'))
-    {
-        // Check for pure USA only version
-        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (USA)\"* 2>/dev/null"));
-        if ($fCheck)
-        {
-            echo "{$thisGame} has a better version available. Moved to Removed folder.\n";
-            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
-            continue;
-        }
-
-        // Check for USA/Japan version
-        $fCheck = trim(shell_exec("ls -1 \"{$niceName} (Japan, USA)\"* 2>/dev/null"));
-        if (!$fCheck) $fCheck = trim(shell_exec("ls -1 \"{$niceName} (USA, Korea)\"* 2>/dev/null"));
-        if ($fCheck)
-        {
-            echo "{$thisGame} has a better version available. Moved to Removed folder.\n";
-            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
-            continue;
-        }
-    }
-
-    // Remove non-English versions e.g. (Se,De,Fr)
-    if (preg_match('%\(Europe\).+\(((?:[A-Za-z]{2}[,|\)])+)%', $thisGame, $languageArray))
-    {
-        // Preg match leaves trailing ) so remove it
-        $languageArray = explode(',', str_replace(')', '', trim($languageArray[1])));
-        if (!in_array('En', $languageArray))
-        {
-            echo "{$thisGame} is a non-english euro release. Moved to Removed folder.\n";
-            shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
-            continue;
-        }
-    }
-
-    // Check for reversions e.g. (Rev 2) or (Rev A)
-    if (preg_match('%\(Rev (\d|[A-Za-z])\)%', $thisGame, $revNum))
-    {
-        if (is_numeric($revNum[1]))
-        {
-            $revNum = intval($revNum[1]);
+            echo "\033[33mbut is empty! Continuing without {$selectedConsole}'s Manual Region Dupes filter.\n\033[0m";
         }
         else
         {
-            $revNum = ord($revNum[1]);
+            echo "\033[32mand is NOT empty! Applying {$selectedConsole}'s Manual Region Dupes filter.\n\033[0m";
+            $anythingManual = true;
         }
     }
-
-    $otherVersions = trim(shell_exec("ls -1 \"{$niceName} (\"*\"(Rev \"* 2>/dev/null"));
-    if ($otherVersions)
-    {
-        $otherVersionArray = explode("\n", $otherVersions);
-        foreach ($otherVersionArray as $otherGame)
-        {
-            preg_match('%\(Rev (\d|[A-Za-z])\)%', $otherGame, $thisRev);
-            if (is_numeric($thisRev[1]))
-            {
-                $thisRev = intval($thisRev[1]);
-            }
-            else
-            {
-                $thisRev = ord($thisRev[1]);
-            }
-
-            if (isset($revNum) && $revNum < $thisRev)
-            {
-                // Other version is newer, bin ours
-                echo "{$thisGame} has an inferior version number [{$revNum} VS. {$thisRev}] - Moved to Removed folder.\n";
-                shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
-                continue 2;
-            }
-        }
-    }
-
-    // Check for reversions double digits e.g. (v1.01)
-    if (preg_match('%\(v(\d\.\d\d)\)%', $thisGame, $revNum))
-    {
-        $revNum = $revNum[1];
-
-        $otherVersions = trim(shell_exec("ls -1 \"{$niceName} (\"*\"(v\"* 2>/dev/null"));
-        if ($otherVersions)
-        {
-            $otherVersionArray = explode("\n", $otherVersions);
-            foreach ($otherVersionArray as $otherGame)
-            {
-                preg_match('%\(v(\d\.\d\d)\)%', $otherGame, $thisRev);
-                $thisRev = $thisRev[1];
-
-                if (isset($revNum) && $revNum < $thisRev)
-                {
-                    // Other version is newer, bin ours
-                    echo "{$thisGameNoExtension} has an inferior version number [{$revNum} VS. {$thisRev}] - Moved to Removed folder.\n";
-                    shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
-                    continue 2;
-                }
-            }
-        }
-    }
-    // Check for reversions single digits e.g. (v1.1) if no double digits found
     else
     {
-        if (preg_match('%\(v(\d\.\d)\)%', $thisGame, $revNum)) $revNum = $revNum[1];
-
-        $otherVersions = trim(shell_exec("ls -1 \"{$niceName} (\"*\"(v\"* 2>/dev/null"));
-        if ($otherVersions)
+        echo "\033[31m{$selectedConsole}'s ManualRegionDupes.csv has NOT been found. Continuing without the Manual Region Dupes filter.\n\033[0m";
+    }
+    // Initialize ManualDemos.csv
+    if (file_exists("FilterQuest/Manual/{$selectedConsole}/ManualDemos.csv"))
+    {
+        echo "\033[32m{$selectedConsole}'s ManualDemos.csv has been found, \033[0m";
+        if (trim(file_get_contents("FilterQuest/Manual/{$selectedConsole}/ManualDemos.csv")) == false)
         {
-            $otherVersionArray = explode("\n", $otherVersions);
+            echo "\033[33mbut is empty! Continuing without {$selectedConsole}'s Manual Demos filter.\n\033[0m";
+        }
+        else
+        {
+            echo "\033[32mand is NOT empty! Applying {$selectedConsole}'s Manual Demos filter.\n\033[0m";
+            $anythingManual = true;
+        }
+    }
+    else
+    {
+        echo "\033[31m{$selectedConsole}'s ManualDemos.csv has NOT been found. Continuing without the Manual Demos filter.\n\033[0m";
+    }
+    // Initialize ManualOthers.csv
+    if (file_exists("FilterQuest/Manual/{$selectedConsole}/ManualOthers.csv"))
+    {
+        echo "\033[32m{$selectedConsole}'s ManualOthers.csv has been found, \033[0m";
+        if (trim(file_get_contents("FilterQuest/Manual/{$selectedConsole}/ManualOthers.csv")) == false)
+        {
+            echo "\033[33mbut is empty! Continuing without {$selectedConsole}'s Manual Others filter.\n\033[0m";
+        }
+        else
+        {
+            echo "\033[32mand is NOT empty! Applying {$selectedConsole}'s Manual Others filter.\n\033[0m";
+            $anythingManual = true;
+        }
+    }
+    else
+    {
+        echo "\033[31m{$selectedConsole}'s ManualOthers.csv has NOT been found. Continuing without the Manual Others filter.\n\033[0m";
+    }
+}
+
+echo "\033[32;4;5m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Starting Process >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n\033[0m";
+chdir('../'); // Go up a directory
+if (!file_exists('Removed/Logs')) // Check if folder structure already exists
+{
+    mkdir('Removed/Logs', 0777, true); // Create folder structure
+}
+array_map('unlink', glob("Removed/Logs/*.csv")); // Remove old logs
+$anythingManual = false; // Declare manual switch as false before we start
+
+// --------------------------------------------------START INTERMEDIATE PHASE-------------------------------------------------- //
+echo "\033[32;4;5m\nStarting Pass 1: Removing foreign releases and non-full retail releases.\n\n\033[0m";
+$fileArray = array_values(preg_grep('/^(\.|\.\.|Removed|FilterQuest)$/', scandir('.') , PREG_GREP_INVERT)); // List all files in directory, rearranging tokens after grepping out unwanted things from the scan.
+// --------------------------------------------------END INTERMEDIATE PHASE-------------------------------------------------- //
+// Do the magic for every file
+foreach ($fileArray as $thisGame)
+{
+    // --------------------------------------------------START PREP-------------------------------------------------- //
+    if (!$thisGame) continue; // Ensure continue if already removed
+    if (!file_exists($thisGame)) continue; // Ensure continue if already removed
+    if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
+    {
+        $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
+    }
+    else
+    {
+        $thisGameNoExtension = $thisGame;
+    }
+    // Iterate with the mother of all preg matches and gain control of every portion of the filename
+    preg_match('/^(?!^$)(^.*?(?=\([^)]*(USA|UK|Europe|Australia)[^)]*\)))(\([^)]*(USA|UK|Europe|Australia)[^)]*\))(.*?)((\(En,(?:[A-Za-z]{2}[,)])+)(.*?))?((\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))(.*?))?(\.[a-zA-Z0-9]+)?$/', $thisGame, $thisGameMatched);
+    // Avoid undefined offset errors by giving anything that doesn't exist a blank value
+    if (!isset($thisGameMatched[1]))
+    {
+        $thisGameMatched[1] = "";
+    }
+    if (!isset($thisGameMatched[3]))
+    {
+        $thisGameMatched[3] = "";
+    }
+    if (!isset($thisGameMatched[5]))
+    {
+        $thisGameMatched[5] = "";
+    }
+    if (!isset($thisGameMatched[7]))
+    {
+        $thisGameMatched[7] = "";
+    }
+    if (!isset($thisGameMatched[8]))
+    {
+        $thisGameMatched[8] = "";
+    }
+    if (!isset($thisGameMatched[10]))
+    {
+        $thisGameMatched[10] = "";
+    }
+    if (!isset($thisGameMatched[13]))
+    {
+        $thisGameMatched[13] = "";
+    }
+    if (!isset($thisGameMatched[14]))
+    {
+        $thisGameMatched[14] = "";
+    }
+    // Escape matches for further matching, remove white space either side and give them all string names
+    $tgBare = preg_quote(trim($thisGameMatched[1]));
+    $tgRegions = preg_quote(trim($thisGameMatched[3]));
+    $tgRegionsCruft = preg_quote(trim($thisGameMatched[5]));
+    $tgLanguages = preg_quote(trim($thisGameMatched[7]));
+    $tgLanguagesCruft = preg_quote(trim($thisGameMatched[8]));
+    $tgVersion = preg_quote(trim($thisGameMatched[10]));
+    $tgVersionCruft = preg_quote(trim($thisGameMatched[13]));
+    $tgExtension = preg_quote(trim($thisGameMatched[14]));
+    // Let the user know what game is being evaluated
+    echo "\033[35m{$thisGameNoExtension} ... \033[0m";
+    // --------------------------------------------------END PREP-------------------------------------------------- //
+    // REMOVE - non-English-speaking countries e.g. "(France)" or "(Japan)"
+    if (preg_match('/\((?=[^)]*(Asia|Austria|Belgium|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Israel|Italy|Japan|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland))(?![^)]*(USA|UK|Europe|Australia))[^)]+\)/', $thisGame, $thisGameMatches))
+    {
+        echo "\033[00;36mforeign release detected: \033[01;34m{$thisGameMatches[0]}\033[00;36m - Moved to Removed folder.\n\033[0m";
+        rename("$thisGame", "Removed/$thisGame");
+        continue;
+    }
+    // REMOVE - non-English language versions e.g. "(Se,De,Fr)"
+    if (preg_match('/\((?=[A-Za-z]{2},)(?![^)]*(En))[^)]+\)/', $thisGame, $thisGameMatches))
+    {
+        echo "\033[00;36mnon-english language release detected: \033[01;34m{$thisGameMatches[0]}\033[00;36m - Moved to Removed folder.\n\033[0m";
+        rename("$thisGame", "Removed/$thisGame");
+        continue;
+    }
+    // REMOVE - non-full retail release e.g. "(Demo)", "(Kiosk)"
+    if (preg_match('/\((Beta|Beta \d+|Debug|Demo|Demo \d+|Developer Cart|EDC|Kiosk|Preview|Review|Review Build|Sample|Unl|\+|Video Demo)\)/', $thisGame, $thisGameMatches))
+    {
+        echo "\033[00;36mnon-retail release detected: \033[01;34m{$thisGameMatches[0]}\033[00;36m - Moved to Removed folder.\n\033[0m";
+        rename("$thisGame", "Removed/$thisGame");
+        continue;
+    }
+    echo "\033[32mis not a foreign or non-retail release. Kept\n\033[0m";
+}
+// --------------------------------------------------START INTERMEDIATE PHASE-------------------------------------------------- //
+echo "\033[32;4;5m\nPass 1 Complete!\033[0m";
+echo "\033[32;4;5m\nStarting Pass 2: Prioritizing in the order: USA > UK > EUR > AUS > Anything Else!\n\n\033[0m";
+$fileArray = array_values(preg_grep('/^(\.|\.\.|Removed|FilterQuest)$/', scandir('.') , PREG_GREP_INVERT));
+// --------------------------------------------------END INTERMEDIATE PHASE-------------------------------------------------- //
+// Do the magic for every file
+foreach ($fileArray as $thisGame)
+{
+    // --------------------------------------------------START PREP-------------------------------------------------- //
+    if (!$thisGame) continue; // Ensure continue if already removed
+    if (!file_exists($thisGame)) continue; // Ensure continue if already removed
+    if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
+    {
+        $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
+    }
+    else
+    {
+        $thisGameNoExtension = $thisGame;
+    }
+    // Iterate with the mother of all preg matches and gain control of every portion of the filename
+    preg_match('/^(?!^$)(^.*?(?=\([^)]*(USA|UK|Europe|Australia)[^)]*\)))(\([^)]*(USA|UK|Europe|Australia)[^)]*\))(.*?)((\(En,(?:[A-Za-z]{2}[,)])+)(.*?))?((\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))(.*?))?(\.[a-zA-Z0-9]+)?$/', $thisGame, $thisGameMatched);
+    // Avoid undefined offset errors by giving anything that doesn't exist a blank value
+    if (!isset($thisGameMatched[1]))
+    {
+        $thisGameMatched[1] = "";
+    }
+    if (!isset($thisGameMatched[3]))
+    {
+        $thisGameMatched[3] = "";
+    }
+    if (!isset($thisGameMatched[5]))
+    {
+        $thisGameMatched[5] = "";
+    }
+    if (!isset($thisGameMatched[7]))
+    {
+        $thisGameMatched[7] = "";
+    }
+    if (!isset($thisGameMatched[8]))
+    {
+        $thisGameMatched[8] = "";
+    }
+    if (!isset($thisGameMatched[10]))
+    {
+        $thisGameMatched[10] = "";
+    }
+    if (!isset($thisGameMatched[13]))
+    {
+        $thisGameMatched[13] = "";
+    }
+    if (!isset($thisGameMatched[14]))
+    {
+        $thisGameMatched[14] = "";
+    }
+    // Escape matches for further matching, remove white space either side and give them all string names
+    $tgBare = preg_quote(trim($thisGameMatched[1]));
+    $tgRegions = preg_quote(trim($thisGameMatched[3]));
+    $tgRegionsCruft = preg_quote(trim($thisGameMatched[5]));
+    $tgLanguages = preg_quote(trim($thisGameMatched[7]));
+    $tgLanguagesCruft = preg_quote(trim($thisGameMatched[8]));
+    $tgVersion = preg_quote(trim($thisGameMatched[10]));
+    $tgVersionCruft = preg_quote(trim($thisGameMatched[13]));
+    $tgExtension = preg_quote(trim($thisGameMatched[14]));
+    // Let the user know what game is being evaluated
+    echo "\033[35m{$thisGameNoExtension} ... \033[0m";
+    // --------------------------------------------------END PREP-------------------------------------------------- //
+    // PRIORITIZE - Check for pure USA only version - IF NO (USA) EXISTS
+    if (!preg_match('/\(USA\)/', $thisGame))
+    {
+        $fileCheck = preg_grep('/^' . $tgBare . ' \(USA\).*$/', $fileArray);
+        if ($fileCheck)
+        {
+            echo "\033[00;36mpure \033[01;34m(USA)\033[00;36m version available instead. Moved to Removed folder.\n\033[0m";
+            rename("$thisGame", "Removed/$thisGame");
+            continue;
+        }
+    }
+    // PRIORITIZE - Check for a combined USA version IF NO (USA) OR (COMBINED USA) EXISTS
+    if (!preg_match('/\([^)]*(USA)[^)]*\)/', $thisGame))
+    {
+        $fileCheck = preg_grep('/^' . $tgBare . ' \((?=.*USA).+, [^)]+\).*$/', $fileArray);
+        if ($fileCheck)
+        {
+            echo "\033[00;36mcombined \033[01;34m(USA)\033[00;36m version available instead. Moved to Removed folder.\n\033[0m";
+            rename("$thisGame", "Removed/$thisGame");
+            continue;
+        }
+    }
+    // PRIORITIZE - Check for pure UK only version IF NO PURE (UK) or ANY (USA)
+    if (!preg_match('/\(UK\)|\([^)]*(USA)[^)]*\)/', $thisGame))
+    {
+        $fileCheck = preg_grep('/^' . $tgBare . ' \(UK\).*$/', $fileArray);
+        if ($fileCheck)
+        {
+            echo "\033[00;36mpure \033[01;34m(UK)\033[00;36m version available instead. Moved to Removed folder.\n\033[0m";
+            rename("$thisGame", "Removed/$thisGame");
+            continue;
+        }
+    }
+    // PRIORITIZE - Check for a combined UK version IF ANY (USA) OR (UK) EXISTS
+    if (!preg_match('/\([^)]*(USA|UK)[^)]*\)/', $thisGame))
+    {
+        $fileCheck = preg_grep('/^' . $tgBare . ' \((?=.*UK).+, [^)]+\).*$/', $fileArray);
+        if ($fileCheck)
+        {
+            echo "\033[00;36mcombined \033[01;34m(UK)\033[00;36m version available instead. Moved to Removed folder.\n\033[0m";
+            rename("$thisGame", "Removed/$thisGame");
+            continue;
+        }
+    }
+    // PRIORITIZE - Check for pure Europe only version IF NO PURE (Europe) or ANY (USA) or (UK) EXISTS
+    if (!preg_match('/\(Europe\)|\([^)]*(USA|UK)[^)]*\)/', $thisGame))
+    {
+        $fileCheck = preg_grep('/^' . $tgBare . ' \(Europe\).*$/', $fileArray);
+        if ($fileCheck)
+        {
+            echo "\033[00;36mpure \033[01;34m(Europe)\033[00;36m version available instead. Moved to Removed folder.\n\033[0m";
+            rename("$thisGame", "Removed/$thisGame");
+            continue;
+        }
+    }
+    // PRIORITIZE - Check for a combined Europe version IF ANY (USA) OR (UK) OR (EUROPE) EXISTS
+    if (!preg_match('/\([^)]*(USA|UK|Europe)[^)]*\)/', $thisGame))
+    {
+        $fileCheck = preg_grep('/^' . $tgBare . ' \((?=.*Europe).+, [^)]+\).*$/', $fileArray);
+        if ($fileCheck)
+        {
+            echo "\033[00;36mcombined \033[01;34m(Europe)\033[00;36m version available instead. Moved to Removed folder.\n\033[0m";
+            rename("$thisGame", "Removed/$thisGame");
+            continue;
+        }
+    }
+    // PRIORITIZE - Check for pure Australia only version IF NO PURE (AUSTRALIA) or ANY (USA), (UK) OR (EUROPE)
+    if (!preg_match('/\(Australia\)|\([^)]*(USA|UK|Europe)[^)]*\)/', $thisGame))
+    {
+        $fileCheck = preg_grep('/^' . $tgBare . ' \(Australia\).*$/', $fileArray);
+        if ($fileCheck)
+        {
+            echo "\033[00;36mpure \033[01;34m(Australia)\033[00;36m version available instead. Moved to Removed folder.\n\033[0m";
+            rename("$thisGame", "Removed/$thisGame");
+            continue;
+        }
+    }
+    // PRIORITIZE - Check for a combined Australia version IF ANY (AUSTRALIA), (USA), (UK) OR (EUROPE) EXISTS
+    if (!preg_match('/\([^)]*(USA|UK|Europe|Australia)[^)]*\)/', $thisGame))
+    {
+        $fileCheck = preg_grep('/^' . $tgBare . ' \((?=.*Australia).+, [^)]+\).*$/', $fileArray);
+        if ($fileCheck)
+        {
+            echo "\033[00;36mcombined \033[01;34m(Australia)\033[00;36m version available instead. Moved to Removed folder.\n\033[0m";
+            rename("$thisGame", "Removed/$thisGame");
+            continue;
+        }
+    }
+    echo "\033[32mhas no better regional version. Kept.\n\033[0m";
+}
+// --------------------------------------------------START INTERMEDIATE PHASE-------------------------------------------------- //
+echo "\033[32;4;5m\nPass 2 Complete!\033[0m";
+echo "\033[32;4;5m\nStarting Pass 3: Prioritizing versions with fewer languages.\n\n\033[0m";
+$fileArray = array_values(preg_grep('/^(\.|\.\.|Removed|FilterQuest)$/', scandir('.') , PREG_GREP_INVERT));
+// --------------------------------------------------END INTERMEDIATE PHASE-------------------------------------------------- //
+// Do the magic for every file
+foreach ($fileArray as $thisGame)
+{
+    // --------------------------------------------------START PREP-------------------------------------------------- //
+    if (!$thisGame) continue; // Ensure continue if already removed
+    if (!file_exists($thisGame)) continue; // Ensure continue if already removed
+    if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
+    {
+        $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
+    }
+    else
+    {
+        $thisGameNoExtension = $thisGame;
+    }
+    // Iterate with the mother of all preg matches and gain control of every portion of the filename
+    preg_match('/^(?!^$)(^.*?(?=\([^)]*(USA|UK|Europe|Australia)[^)]*\)))(\([^)]*(USA|UK|Europe|Australia)[^)]*\))(.*?)((\(En,(?:[A-Za-z]{2}[,)])+)(.*?))?((\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))(.*?))?(\.[a-zA-Z0-9]+)?$/', $thisGame, $thisGameMatched);
+    // Avoid undefined offset errors by giving anything that doesn't exist a blank value
+    if (!isset($thisGameMatched[1]))
+    {
+        $thisGameMatched[1] = "";
+    }
+    if (!isset($thisGameMatched[3]))
+    {
+        $thisGameMatched[3] = "";
+    }
+    if (!isset($thisGameMatched[5]))
+    {
+        $thisGameMatched[5] = "";
+    }
+    if (!isset($thisGameMatched[7]))
+    {
+        $thisGameMatched[7] = "";
+    }
+    if (!isset($thisGameMatched[8]))
+    {
+        $thisGameMatched[8] = "";
+    }
+    if (!isset($thisGameMatched[10]))
+    {
+        $thisGameMatched[10] = "";
+    }
+    if (!isset($thisGameMatched[13]))
+    {
+        $thisGameMatched[13] = "";
+    }
+    if (!isset($thisGameMatched[14]))
+    {
+        $thisGameMatched[14] = "";
+    }
+    // Escape matches for further matching, remove white space either side and give them all string names
+    $tgBare = preg_quote(trim($thisGameMatched[1]));
+    $tgRegions = preg_quote(trim($thisGameMatched[3]));
+    $tgRegionsCruft = preg_quote(trim($thisGameMatched[5]));
+    $tgLanguages = preg_quote(trim($thisGameMatched[7]));
+    $tgLanguagesCruft = preg_quote(trim($thisGameMatched[8]));
+    $tgVersion = preg_quote(trim($thisGameMatched[10]));
+    $tgVersionCruft = preg_quote(trim($thisGameMatched[13]));
+    $tgExtension = preg_quote(trim($thisGameMatched[14]));
+    // Let the user know what game is being evaluated
+    echo "\033[35m{$thisGameNoExtension} ... \033[0m";
+    // --------------------------------------------------END PREP-------------------------------------------------- //
+    // PURIFY - Check for a version without any extra languages
+    if (preg_match('/\(En,(?:[A-Za-z]{2}[,)])*/', $thisGame))
+    {
+        $fileCheck = preg_grep('/^' . $tgBare . ' ?' . $tgRegions . ' ?' . $tgRegionsCruft . ' ?' . $tgLanguagesCruft . ' ?' . $tgVersion . ' ?' . $tgVersionCruft . ' ?' . $tgExtension . '$/', $fileArray);
+        if ($fileCheck)
+        {
+            echo "\033[00;36mversion without any extra languages detected. Moved to Removed folder.\n\033[0m";
+            rename("$thisGame", "Removed/$thisGame");
+            continue;
+        }
+    }
+    // PURIFY - Keep version with the least languages
+    if (preg_match('/\(En,(?:[A-Za-z]{2}[,)])*/', $thisGame, $thisLanguageBracket))
+    {
+        $thisLanguageBracketLength = strlen($thisLanguageBracket[0]);
+        $otherVersionArray = preg_grep('/^' . $tgBare . ' ?' . $tgRegions . ' ?' . $tgRegionsCruft . ' ?\(En,(?:[A-Za-z]{2}[,)])* ?' . $tgLanguagesCruft . ' ?' . $tgVersion . ' ?' . $tgVersionCruft . ' ?' . $tgExtension . '$/', $fileArray); // Matches to the end
+        if ($otherVersionArray)
+        {
             foreach ($otherVersionArray as $otherGame)
             {
-                preg_match('%\(v(\d\.\d)\)%', $otherGame, $thisRev);
-                $thisRev = $thisRev[1];
-
-                if (isset($revNum) && $revNum < $thisRev)
+                if (preg_match('/\(En,(?:[A-Za-z]{2}[,)])*/', $otherGame, $otherLanguageBracket))
+                {
+                    $otherLanguageBracketLength = strlen($otherLanguageBracket[0]);
+                }
+                if ($thisLanguageBracketLength > $otherLanguageBracketLength)
+                {
+                    // Other version is longer, bin ours
+                    echo "\033[00;36mversion with less languages detected! \033[01;34m{$otherLanguageBracket[0]}\033[00;36m VS. \033[01;34m{$thisLanguageBracket[0]}\033[00;36m - Moved to Removed folder.\n\033[0m";
+                    rename("$thisGame", "Removed/$thisGame");
+                    continue 2;
+                }
+                // Try & settle equal lengths by looking for Western-European languages
+                if ($thisLanguageBracketLength == $otherLanguageBracketLength && $thisLanguageBracket !== $otherLanguageBracket) // Ensure we're not comparing the same bracket
+                
+                {
+                    $thisLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Fr|De|Es|It)(?=[,)])/', '', $thisLanguageBracket);
+                    $otherLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Fr|De|Es|It)(?=[,)])/', '', $otherLanguageBracket);
+                    $thisLanguageBracketLength = strlen($thisLanguageBracketReduced[0]);
+                    $otherLanguageBracketLength = strlen($otherLanguageBracketReduced[0]);
+                    if ($thisLanguageBracketLength > $otherLanguageBracketLength)
+                    {
+                        // Other version has more favourable languages, bin ours
+                        echo "\033[00;36mSame amount but less favourable languages detected! \033[01;34m{$otherLanguageBracket[0]}\033[00;36m VS. \033[01;34m{$thisLanguageBracket[0]}\033[00;36m - Moved to Removed folder.\n\033[0m";
+                        rename("$thisGame", "Removed/$thisGame");
+                        continue 2;
+                    }
+                    if ($thisLanguageBracketLength == $otherLanguageBracketLength) // Try again to differentiate, this time with just France & Spain
+                    
+                    {
+                        $thisLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Fr|Es)(?=[,)])/', '', $thisLanguageBracket);
+                        $otherLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Fr|Es)(?=[,)])/', '', $otherLanguageBracket);
+                        $thisLanguageBracketLength = strlen($thisLanguageBracketReduced[0]);
+                        $otherLanguageBracketLength = strlen($otherLanguageBracketReduced[0]);
+                        if ($thisLanguageBracketLength > $otherLanguageBracketLength)
+                        {
+                            // Other version has more favourable languages after two passes, bin ours
+                            echo "\033[00;36mSame amount but less favourable languages detected. Phew! \033[01;34m{$otherLanguageBracket[0]}\033[00;36m VS. \033[01;34m{$thisLanguageBracket[0]}\033[00;36m - Moved to Removed folder.\n\033[0m";
+                            rename("$thisGame", "Removed/$thisGame");
+                            continue 2;
+                        }
+                        if ($thisLanguageBracketLength == $otherLanguageBracketLength) // Try one last time differentiate, this time with Netherlands
+                        
+                        {
+                            $thisLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Nl)(?=[,)])/', '', $thisLanguageBracket);
+                            $otherLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Nl)(?=[,)])/', '', $otherLanguageBracket);
+                            $thisLanguageBracketLength = strlen($thisLanguageBracketReduced[0]);
+                            $otherLanguageBracketLength = strlen($otherLanguageBracketReduced[0]);
+                            if ($thisLanguageBracketLength > $otherLanguageBracketLength)
+                            {
+                                // Other version has more favourable languages after three passes, bin ours
+                                echo "\033[00;36mSame amount but less favourable languages detected. Phew! \033[01;34m{$otherLanguageBracket[0]}\033[00;36m VS. \033[01;34m{$thisLanguageBracket[0]}\033[00;36m - Moved to Removed folder.\n\033[0m";
+                                rename("$thisGame", "Removed/$thisGame");
+                                continue 2;
+                            }
+                        }
+                        if ($thisLanguageBracketLength == $otherLanguageBracketLength)
+                        {
+                            $otherGameNoExtension = pathinfo($otherGame, PATHINFO_FILENAME); // Remove file extension
+                            echo "\033[31mCannot differentiate between \033[01;34m{$thisGameNoExtension}\033[31m and \033[01;34m{$otherGameNoExtension}\033[31m as both have the same number of key languages. Both kept.\n\033[0m";
+                            continue 2;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    echo "\033[32mhas the least languages for its kind. Kept.\n\033[0m";
+}
+// --------------------------------------------------START INTERMEDIATE PHASE-------------------------------------------------- //
+echo "\033[32;4;5m\nPass 3 Complete!\033[0m";
+echo "\033[32;4;5m\nStarting Pass 4: Prioritizing newer versions.\n\n\033[0m";
+$fileArray = array_values(preg_grep('/^(\.|\.\.|Removed|FilterQuest)$/', scandir('.') , PREG_GREP_INVERT));
+// --------------------------------------------------END INTERMEDIATE PHASE-------------------------------------------------- //
+// Do the magic for every file
+foreach ($fileArray as $thisGame)
+{
+    // --------------------------------------------------START PREP-------------------------------------------------- //
+    if (!$thisGame) continue; // Ensure continue if already removed
+    if (!file_exists($thisGame)) continue; // Ensure continue if already removed
+    if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
+    {
+        $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
+    }
+    else
+    {
+        $thisGameNoExtension = $thisGame;
+    }
+    // Iterate with the mother of all preg matches and gain control of every portion of the filename
+    preg_match('/^(?!^$)(^.*?(?=\([^)]*(USA|UK|Europe|Australia)[^)]*\)))(\([^)]*(USA|UK|Europe|Australia)[^)]*\))(.*?)((\(En,(?:[A-Za-z]{2}[,)])+)(.*?))?((\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))(.*?))?(\.[a-zA-Z0-9]+)?$/', $thisGame, $thisGameMatched);
+    // Avoid undefined offset errors by giving anything that doesn't exist a blank value
+    if (!isset($thisGameMatched[1]))
+    {
+        $thisGameMatched[1] = "";
+    }
+    if (!isset($thisGameMatched[3]))
+    {
+        $thisGameMatched[3] = "";
+    }
+    if (!isset($thisGameMatched[5]))
+    {
+        $thisGameMatched[5] = "";
+    }
+    if (!isset($thisGameMatched[7]))
+    {
+        $thisGameMatched[7] = "";
+    }
+    if (!isset($thisGameMatched[8]))
+    {
+        $thisGameMatched[8] = "";
+    }
+    if (!isset($thisGameMatched[10]))
+    {
+        $thisGameMatched[10] = "";
+    }
+    if (!isset($thisGameMatched[13]))
+    {
+        $thisGameMatched[13] = "";
+    }
+    if (!isset($thisGameMatched[14]))
+    {
+        $thisGameMatched[14] = "";
+    }
+    // Escape matches for further matching, remove white space either side and give them all string names
+    $tgBare = preg_quote(trim($thisGameMatched[1]));
+    $tgRegions = preg_quote(trim($thisGameMatched[3]));
+    $tgRegionsCruft = preg_quote(trim($thisGameMatched[5]));
+    $tgLanguages = preg_quote(trim($thisGameMatched[7]));
+    $tgLanguagesCruft = preg_quote(trim($thisGameMatched[8]));
+    $tgVersion = preg_quote(trim($thisGameMatched[10]));
+    $tgVersionCruft = preg_quote(trim($thisGameMatched[13]));
+    $tgExtension = preg_quote(trim($thisGameMatched[14]));
+    // Let the user know what game is being evaluated
+    echo "\033[35m{$thisGameNoExtension} ... \033[0m";
+    // --------------------------------------------------END PREP-------------------------------------------------- //
+    // UPGRADE - Check for a revision of current no-revision game
+    if (!preg_match('/(\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))/', $thisGame))
+    {
+        $fileCheck = preg_grep('/^' . $tgBare . ' ?' . $tgRegions . ' ? ' . $tgRegionsCruft . '.*?(\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\)) ?' . $tgVersionCruft . ' ?' . $tgExtension . '$/', $fileArray); // Matches to the end but ignores languages so version takes priority
+        if ($fileCheck)
+        {
+            echo "\033[00;36mthis non-revision game appears to have a revision version. Moved to Removed folder.\n\033[0m";
+            rename("$thisGame", "Removed/$thisGame");
+            continue;
+        }
+    }
+    // UPGRADE - Versions e.g. "(Rev 2)" > "(Rev 1)" or "(Rev B)" > "(Rev A)"
+    if (preg_match('/\(Rev ([A-Z]|[0-9]+)\)/', $thisGame, $thisRev))
+    {
+        if (is_numeric($thisRev[1]))
+        {
+            $thisRevOrdered = intval($thisRev[1]);
+        }
+        else
+        {
+            $thisRevOrdered = ord($thisRev[1]);
+        }
+        $otherVersions = preg_grep('/^' . $tgBare . ' ?' . $tgRegions . ' ? ' . $tgRegionsCruft . '.*?\(Rev ([A-Z]|[0-9]+)\) ?' . $tgVersionCruft . ' ?' . $tgExtension . '$/', $fileArray); // Matches to the end but ignores languages so version takes priority
+        if ($otherVersions)
+        {
+            foreach ($otherVersions as $otherGame)
+            {
+                preg_match('/\(Rev ([A-Z]|[0-9]+)\)/', $otherGame, $otherRev);
+                if (is_numeric($otherRev[1]))
+                {
+                    $otherRevOrdered = intval($otherRev[1]);
+                }
+                else
+                {
+                    $otherRevOrdered = ord($otherRev[1]);
+                }
+                if ($thisRevOrdered < $otherRevOrdered)
                 {
                     // Other version is newer, bin ours
-                    echo "{$thisGameNoExtension} has an inferior version number [{$revNum} VS. {$thisRev}] - Moved to Removed folder.\n";
-                    shell_exec("mv " . escapeshellarg($thisGame) . " Removed/");
+                    echo "\033[00;36mnewer version detected \033[01;34m{$thisRev[0]}\033[00;36m VS. \033[01;34m{$otherRev[0]}\033[00;36m - Moved to Removed folder.\n\033[0m";
+                    rename("$thisGame", "Removed/$thisGame");
                     continue 2;
                 }
             }
         }
     }
-
-    echo "{$thisGameNoExtension} scanned and kept.\n";
-
-    // Move "(Track X)" games to a folder to process
-    /*
-    if(preg_match('%\(Track \d+\)%', $thisGame)) {
-    $tracklessName = preg_replace('%\s*\(Track \d+\)%', '', $thisGame);
-    $tracklessName = preg_replace('%\.bin$%', '', $tracklessName);
-    shell_exec("mv \"{$thisGame}\" Process/");
-    shell_exec("mv \"{$tracklessName}.cue\" Process/");
+    // UPGRADE - Newer versions e.g. "(v1.02)" > "(v1.01)" or "(v1.2)" > "(v1.1)"
+    if (preg_match('/\(v([0-9]+\.[0-9]+|[0-9]+)\)/', $thisGame, $thisRev))
+    {
+        $otherVersions = preg_grep('/^' . $tgBare . ' ?' . $tgRegions . ' ? ' . $tgRegionsCruft . '.*?(\(v([0-9]+\.[0-9]+|[0-9]+)\)) ?' . $tgVersionCruft . ' ?' . $tgExtension . '$/', $fileArray); // Matches to the end
+        if ($otherVersions)
+        {
+            foreach ($otherVersions as $otherGame)
+            {
+                preg_match('/\(v([0-9]+\.[0-9]+|[0-9]+)\)/', $otherGame, $otherRev);
+                if ($thisRev[1] < $otherRev[1])
+                {
+                    // Other version is newer, bin ours
+                    echo "\033[00;36mnewer version detected \033[01;34m{$thisRev[0]}\033[00;36m VS. \033[01;34m{$otherRev[0]}\033[00;36m - Moved to Removed folder.\n\033[0m";
+                    rename("$thisGame", "Removed/$thisGame");
+                    continue 2;
+                }
+            }
+        }
     }
-    */
+    echo "\033[32mis the most recent version of it's kind. Kept.\n\033[0m";
 }
-echo "\nProcess complete!";
+// --------------------------------------------------START OPTIONAL INTERMEDIATE PHASE-------------------------------------------------- //
+echo "\033[32;4;5m\nPass 4 Complete!\033[0m";
+if ($anythingManual == true)
+{
+    echo "\033[32;4;5m\nStarting Pass 5: Manual filter pass.\n\n\033[0m";
+    $fileArray = array_values(preg_grep('/^(\.|\.\.|Removed|FilterQuest)$/', scandir('.') , PREG_GREP_INVERT));
+    // --------------------------------------------------END OPTIONAL INTERMEDIATE PHASE-------------------------------------------------- //
+    // Do the magic for every file
+    foreach ($fileArray as $thisGame)
+    {
+        // --------------------------------------------------START PREP-------------------------------------------------- //
+        if (!$thisGame) continue; // Ensure continue if already removed
+        if (!file_exists($thisGame)) continue; // Ensure continue if already removed
+        if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
+        {
+            $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
+        }
+        else
+        {
+            $thisGameNoExtension = $thisGame;
+        }
+        // Iterate with the mother of all preg matches and gain control of every portion of the filename
+        preg_match('/^(?!^$)(^.*?(?=\([^)]*(USA|UK|Europe|Australia)[^)]*\)))(\([^)]*(USA|UK|Europe|Australia)[^)]*\))(.*?)((\(En,(?:[A-Za-z]{2}[,)])+)(.*?))?((\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))(.*?))?(\.[a-zA-Z0-9]+)?$/', $thisGame, $thisGameMatched);
+        // Avoid undefined offset errors by giving anything that doesn't exist a blank value
+        if (!isset($thisGameMatched[1]))
+        {
+            $thisGameMatched[1] = "";
+        }
+        if (!isset($thisGameMatched[3]))
+        {
+            $thisGameMatched[3] = "";
+        }
+        if (!isset($thisGameMatched[5]))
+        {
+            $thisGameMatched[5] = "";
+        }
+        if (!isset($thisGameMatched[7]))
+        {
+            $thisGameMatched[7] = "";
+        }
+        if (!isset($thisGameMatched[8]))
+        {
+            $thisGameMatched[8] = "";
+        }
+        if (!isset($thisGameMatched[10]))
+        {
+            $thisGameMatched[10] = "";
+        }
+        if (!isset($thisGameMatched[13]))
+        {
+            $thisGameMatched[13] = "";
+        }
+        if (!isset($thisGameMatched[14]))
+        {
+            $thisGameMatched[14] = "";
+        }
+        // Escape matches for further matching, remove white space either side and give them all string names
+        $tgBare = preg_quote(trim($thisGameMatched[1]));
+        $tgRegions = preg_quote(trim($thisGameMatched[3]));
+        $tgRegionsCruft = preg_quote(trim($thisGameMatched[5]));
+        $tgLanguages = preg_quote(trim($thisGameMatched[7]));
+        $tgLanguagesCruft = preg_quote(trim($thisGameMatched[8]));
+        $tgVersion = preg_quote(trim($thisGameMatched[10]));
+        $tgVersionCruft = preg_quote(trim($thisGameMatched[13]));
+        $tgExtension = preg_quote(trim($thisGameMatched[14]));
+        // Let the user know what game is being evaluated
+        echo "\033[35m{$thisGameNoExtension} ... \033[0m";
+        // --------------------------------------------------END PREP-------------------------------------------------- //
+        // Remove filenames in ManualRegionDupes.csv if the primary version exists
+        if (file_exists('FilterQuest/Manual/{$selectedConsole}/ManualRegionDupes.csv'))
+        {
+            $csvManualRegionDupes = fopen("FilterQuest/Manual/{$selectedConsole}/ManualRegionDupes.csv", "r");
+            while ($csvRow = fgetcsv($csvManualRegionDupes))
+            {
+                if (in_array($thisGameNoExtension, array_slice($csvRow, 1, 3)))
+                {
+                    $fileCheck = preg_grep('/^' . preg_quote($csvRow[0]) . '' . $tgExtension . '$/', $fileArray); // Assumes primary counterpart has same extension
+                    if ($fileCheck)
+                    {
+                        echo "\033[36mis on the Manual Region Dupes list and primary version detected. Moved to Removed folder.\n\033[0m";
+                        rename("$thisGame", "Removed/$thisGame");
+                        $csvManualRegionDupesRemoved = fopen("Removed/Logs/ManualRegionDupesRemoved.csv", "a");
+                        fwrite($csvManualRegionDupesRemoved, "\"" . $thisGameNoExtension . "\"\n");
+                        fclose($csvManualRegionDupesRemoved);
+                        continue 2;
+                    }
+                    else
+                    {
+                        echo "\033[31mis on the Manual Region Dupes list but primary version is missing. Kept for now.\n\033[0m";
+                        continue 2;
+                    }
+                }
+            }
+            fclose($csvManualRegionDupes);
+        }
+        // Remove filenames in ManualDemos.csv
+        if (file_exists('FilterQuest/Manual/{$selectedConsole}/ManualDemos.csv'))
+        {
+            $csvManualDemos = fopen("FilterQuest/Manual/{$selectedConsole}/ManualDemos.csv", "r");
+            while ($csvRow = fgetcsv($csvManualDemos))
+            {
+                if (in_array($thisGameNoExtension, array_slice($csvRow, 0)))
+                {
+                    echo "\033[36mis on the Manual Demos remove list. Moved to Removed folder.\n\033[0m";
+                    rename("$thisGame", "Removed/$thisGame");
+                    $csvManualDemosRemoved = fopen("Removed/Logs/ManualDemosRemoved.csv", "a");
+                    fwrite($csvManualDemosRemoved, "\"" . $thisGameNoExtension . "\"\n");
+                    fclose($csvManualDemosRemoved);
+                    continue 2;
+                }
+            }
+        }
+        // Remove filenames in ManualOthers.csv
+        if (file_exists('FilterQuest/Manual/{$selectedConsole}/ManualOthers.csv'))
+        {
+            $csvManualOthers = fopen("FilterQuest/Manual/{$selectedConsole}/ManualOthers.csv", "r");
+            while ($csvRow = fgetcsv($csvManualOthers))
+            {
+                if (in_array($thisGameNoExtension, array_slice($csvRow, 0)))
+                {
+                    echo "\033[36mis on the Manual Others remove list. Moved to Removed folder.\n\033[0m";
+                    rename("$thisGame", "Removed/$thisGame");
+                    $csvManualOthersRemoved = fopen("Removed/Logs/ManualOthersRemoved.csv", "a");
+                    fwrite($csvManualOthersRemoved, "\"" . $thisGameNoExtension . "\"\n");
+                    fclose($csvManualOthersRemoved);
+                    continue 2;
+                }
+            }
+        }
+        echo "\033[32mis not on any manual remove lists. Kept.\n\033[0m";
+    }
+    // --------------------------------------------------START OPTIONAL INTERMEDIATE PHASE-------------------------------------------------- //
+    echo "\033[32;4;5m\nPass 5 Complete!\033[0m";
+    // --------------------------------------------------END OPTIONAL INTERMEDIATE PHASE-------------------------------------------------- //
+}
+else
+{
+    echo "\033[32;4;5m\nPass 5: Manual filter pass - no manual filters selected.\n\033[0m";
+}
+echo "\033[32;4m\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Process Complete! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n\033[0m";
 ?>
