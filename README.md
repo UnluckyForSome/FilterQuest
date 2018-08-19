@@ -40,5 +40,7 @@ Filterquest is a PHP script which requires a POSIX environment with PHP installe
 FilterQuest relies on games being named in the popular Redump/No-Intro naming conventions, for example "Game (USA)". These games must all be in the same directory.
 
 ## Usage
-On Windows, download and place the entire "FilterQuest" directory into the same directory as your games, then using the Cygwin Terminal navigate to the same directory and use `php FilterQuest` to run. On Linux use the same method except use the Linux Terminal. Filterquest will create a "Removed" folder in your games directory in which it will put all the games it thinks need removing. If manual lists are used, a "Logs" folder will also be created within the "Removed" folder with logs of what has been removed in regards to the manual lists. Remember, FilterQuest is looking for games one directory up from where it is run from, so make sure you paste the FilterQuest folder and not just all the files!
-
+- Click the green "Clone or download" button and "Download ZIP". Extract the archive and place the entire "FilterQuest" folder into the same directory as your games. Remember to keep the entire contents of FilterQuest in it's own folder. You can call it what you like - as long as the FilterQuest folder is in with all your games you should be good.
+- On Windows, using the Cygwin Terminal navigate to the same directory and then use `php FilterQuest` to run. On Linux use the same method except use the Linux Terminal.
+- Filterquest will create a "Removed" folder in your games directory in which it will put all the games it thinks need removing. If manual lists are used, a "Logs" folder will also be created within the "Removed" folder with logs of what has been removed in regards to the manual lists.
+- Remember, FilterQuest is looking for games one directory up from where the script is run from, so make sure you paste the FilterQuest folder into your games directory, and not just all the files!
