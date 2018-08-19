@@ -10,7 +10,6 @@ echo "\033[00;32mContinue? (y/n): \n\033[0m";
 $stdin = fopen('php://stdin', 'r');
 $response = fgetc($stdin);
 if ($response != 'y') // Start her up!
-
 {
     echo "\033[31mAborted.\n\033[0m";
     exit;
@@ -133,10 +132,8 @@ foreach ($fileArray as $thisGame)
     if (!$thisGame) continue; // Ensure continue if already removed
     if (!file_exists($thisGame)) continue; // Ensure continue if already removed
     if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
-    
     {
         $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
-        
     }
     else
     {
@@ -224,10 +221,8 @@ foreach ($fileArray as $thisGame)
     if (!$thisGame) continue; // Ensure continue if already removed
     if (!file_exists($thisGame)) continue; // Ensure continue if already removed
     if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
-    
     {
         $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
-        
     }
     else
     {
@@ -382,10 +377,8 @@ foreach ($fileArray as $thisGame)
     if (!$thisGame) continue; // Ensure continue if already removed
     if (!file_exists($thisGame)) continue; // Ensure continue if already removed
     if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
-    
     {
         $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
-        
     }
     else
     {
@@ -538,10 +531,8 @@ foreach ($fileArray as $thisGame)
     if (!$thisGame) continue; // Ensure continue if already removed
     if (!file_exists($thisGame)) continue; // Ensure continue if already removed
     if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
-    
     {
         $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
-        
     }
     else
     {
@@ -675,10 +666,8 @@ if ($anythingManual == true)
         if (!$thisGame) continue; // Ensure continue if already removed
         if (!file_exists($thisGame)) continue; // Ensure continue if already removed
         if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
-        
         {
             $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
-            
         }
         else
         {
@@ -797,7 +786,6 @@ if ($anythingManual == true)
     // --------------------------------------------------START OPTIONAL INTERMEDIATE PHASE-------------------------------------------------- //
     echo "\033[32;4;5m\nPass 5 Complete!\033[0m";
     // --------------------------------------------------END OPTIONAL INTERMEDIATE PHASE-------------------------------------------------- //
-    
 }
 else
 {
