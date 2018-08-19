@@ -1,5 +1,5 @@
 # FilterQuest
-Filterquest is a powerful script which uses the No-Intro and Redump naming conventions to filter out any potential games which you wouldn't want, saving you space on your drives and giving you more clarity within your collections. In addition it uses manual lists to remove region duplicates with different names, as well as non-marked Demos and Utilities. You can find these lists [here](https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pubhtml?gid=1464817576#).
+Filterquest is a powerful script which uses the No-Intro and Redump naming conventions to filter out any potential games which you wouldn't want, saving you space on your drives and giving you more clarity within your collections. In addition it uses [manual lists](https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pubhtml?gid=1464817576#) to remove region duplicates with different names, as well as non-marked Demos and Utilities.
 
 ## Results
 Filterquest **won't delete any files**. The script will output a folder named "Removed" in which all the filtered games which FilterQuest thinks you don't want will be moved. You can easily recover your original collection by moving these files back into the original folder.
