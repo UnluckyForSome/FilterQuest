@@ -507,7 +507,7 @@ foreach ($fileArray as $thisGame)
                         if ($thisLanguageBracketLength == $otherLanguageBracketLength)
                         {
                             $otherGameNoExtension = pathinfo($otherGame, PATHINFO_FILENAME); // Remove file extension
-                            echo "\033[31mCannot differentiate between \033[01;34m{$thisGameNoExtension}\033[31m and \033[01;34m{$otherGameNoExtension}\033[31m as both have the same number of key languages. Both kept.\n\033[0m";
+                            echo "\033[31mCannot differentiate between \033[01;34m{$thisGameNoExtension}\033[00;31m and \033[01;34m{$otherGameNoExtension}\033[00;31m as both have the same number of key languages. Both kept.\n\033[0m";
                             continue 2;
                         }
                     }
