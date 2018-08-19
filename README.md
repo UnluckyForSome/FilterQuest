@@ -24,7 +24,7 @@ Versions of the same game with fewer languages will be prioritized - e.g if "Gam
 Lower versions of the same game will be removed - e.g if "Game (USA) (v1.2)" exists "Game (USA) (v1.1)" will be removed. If "Game (USA) (Rev A)" exists "Game (USA) (Rev B)" will be removed.
 
 - Manual Region Duplicates
-Not all games have the same names in different regions and so can't automatically be filtered. To tackle this, Filterquest has reguarly updated built in ["lists"](https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pubhtml?gid=1464817576#) which it uses to identify that a "primary" game is present and then subsequently removes the region duplicate. If no primary version is present it is left alone. You can veiw these lists with the link above.
+Not all games have the same names in different regions and so can't automatically be filtered. To tackle this, Filterquest has reguarly updated built in "[lists](https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pubhtml?gid=1464817576#)" which it uses to identify that a "primary" game is present and then subsequently removes the region duplicate. If no primary version is present it is left alone. You can veiw these lists with the link above.
 
 - Manual Demos
 Uses a manual "list" to identify demos which for one reason or another haven't been marked with the "(Demo)" tag in the filename - e.g "Best Games Ever 1"
