@@ -6,29 +6,369 @@
 
 <?php
 echo "\033[00;32mWelcome! FilterQuest will loop through the folder it's directory is in and move any duplicates it finds into a seperate folder. On large collections this can take up to 20 minutes due to multiple passes (we have to be thorough!). No files will be deleted.\n\n\033[0m";
-echo "\033[00;32mContinue? (y/n): \n\033[0m";
+echo "\033[00;32mContinue? (y/n): \033[0m";
 $phpSTDIN = fopen("php://stdin", "r");
 $userResponse = fgetc($phpSTDIN);
 if (strtoupper($userResponse) != 'Y') // Start her up!
+
 {
     echo "\033[31mAborted.\n\033[0m";
     exit;
 }
 else
 {
-    echo "\033[32m\n\n\033[0m";
+    echo "\033[35mLet's do this!\033[0m";
 }
 // --------------------------------------------------START BEGINNING PHASE-------------------------------------------------- //
 $parentDirectory = dirname(__FILE__); // Get directory that FilterQuest is inside
 chdir('../'); // Go up a directory
 if (!file_exists('Removed/Logs')) // Check if folder structure already exists
+
 {
     mkdir('Removed/Logs', 0777, true); // Create folder structure
+    
 }
 array_map('unlink', glob("Removed/Logs/*.csv")); // Remove old logs
 $anythingManual = false; // Declare manual switch as false before we start
 // --------------------------------------------------START BEGINNING PHASE-------------------------------------------------- //
-echo "\033[00;32mTo enable FilterQuest's built-in manual filters, please type the name of the system you are filtering games for. Alternatively, hit enter to continue without any manual filters.\n\n\033[0m";
+echo "\033[00;32m\n\nWould you like to pull the lastest manual filters from the live Google Sheet? This will overwrite any filters already in place.\n\n\033[0m";
+echo "\033[00;32mUpdate? (y/n): \033[0m";
+$phpSTDIN = fopen("php://stdin", "r");
+$userResponse = fgetc($phpSTDIN);
+if (strtoupper($userResponse) == 'Y')
+{
+    echo "\033[00;35mOK, updating!\n\033[0m";
+    echo "\033[00;35m\n1/15 - Checking PS1 ManualRegionDupes... \033[0m";
+    if (file_exists("{$parentDirectory}/Manual/PS1/ManualRegionDupes.csv"))
+    {
+        if (sha1_file("{$parentDirectory}/Manual/PS1/ManualRegionDupes.csv") === sha1_file("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1464817576&single=true&output=csv")) // Manual XXX RegionDupes
+        
+        {
+            echo "\033[00;32mUp-to-date!\033[0m";
+        }
+        else
+        {
+            echo "\033[00;32mUpdate found! \033[00;35mDownloading... \033[0m";
+            file_put_contents("{$parentDirectory}/Manual/PS1/ManualRegionDupes.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1464817576&single=true&output=csv", 'r')); // Manual XXX RegionDupes
+            echo "\033[00;32mDone!\033[0m";
+        }
+    }
+    else
+    {
+        echo "\033[00;32mNo file found! \033[00;35mDownloading... \033[0m";
+        file_put_contents("{$parentDirectory}/Manual/PS1/ManualRegionDupes.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1464817576&single=true&output=csv", 'r')); // Manual XXX RegionDupes
+        echo "\033[00;32mDone!\033[0m";
+    }
+    echo "\033[00;35m\n2/15 - Checking PS1 ManualDemos... \033[0m";
+    if (file_exists("{$parentDirectory}/Manual/PS1/ManualDemos.csv"))
+    {
+        if (sha1_file("{$parentDirectory}/Manual/PS1/ManualDemos.csv") === sha1_file("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=556229285&single=true&output=csv")) // Manual XXX Demos
+        
+        {
+            echo "\033[00;32mUp-to-date!\033[0m";
+        }
+        else
+        {
+            echo "\033[00;32mUpdate found! \033[00;35mDownloading... \033[0m";
+            file_put_contents("{$parentDirectory}/Manual/PS1/ManualDemos.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=556229285&single=true&output=csv", 'r')); // Manual XXX Demos
+            echo "\033[00;32mDone!\033[0m";
+        }
+    }
+    else
+    {
+        echo "\033[00;32mNo file found! \033[00;35mDownloading... \033[0m";
+        file_put_contents("{$parentDirectory}/Manual/PS1/ManualDemos.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=556229285&single=true&output=csv", 'r')); // Manual XXX Demos
+        echo "\033[00;32mDone!\033[0m";
+    }
+    echo "\033[00;35m\n3/15 - Checking PS1 ManualOthers... \033[0m";
+    if (file_exists("{$parentDirectory}/Manual/PS1/ManualOthers.csv"))
+    {
+        if (sha1_file("{$parentDirectory}/Manual/PS1/ManualOthers.csv") === sha1_file("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=51497037&single=true&output=csv")) // Manual XXX Others
+        
+        {
+            echo "\033[00;32mUp-to-date!\033[0m";
+        }
+        else
+        {
+            echo "\033[00;32mUpdate found! \033[00;35mDownloading... \033[0m";
+            file_put_contents("{$parentDirectory}/Manual/PS1/ManualOthers.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=51497037&single=true&output=csv", 'r')); // Manual XXX Others
+            echo "\033[00;32mDone!\033[0m";
+        }
+    }
+    else
+    {
+        echo "\033[00;32mNo file found! \033[00;35mDownloading... \033[0m";
+        file_put_contents("{$parentDirectory}/Manual/PS1/ManualOthers.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=51497037&single=true&output=csv", 'r')); // Manual XXX Others
+        echo "\033[00;32mDone!\033[0m";
+    }
+
+    echo "\033[00;35m\n4/15 - Checking PS2 ManualRegionDupes... \033[0m";
+    if (file_exists("{$parentDirectory}/Manual/PS2/ManualRegionDupes.csv"))
+    {
+        if (sha1_file("{$parentDirectory}/Manual/PS2/ManualRegionDupes.csv") === sha1_file("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=0&single=true&output=csv")) // Manual XXX RegionDupes
+        
+        {
+            echo "\033[00;32mUp-to-date!\033[0m";
+        }
+        else
+        {
+            echo "\033[00;32mUpdate found! \033[00;35mDownloading... \033[0m";
+            file_put_contents("{$parentDirectory}/Manual/PS2/ManualRegionDupes.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=0&single=true&output=csv", 'r')); // Manual XXX RegionDupes
+            echo "\033[00;32mDone!\033[0m";
+        }
+    }
+    else
+    {
+        echo "\033[00;32mNo file found! \033[00;35mDownloading... \033[0m";
+        file_put_contents("{$parentDirectory}/Manual/PS2/ManualRegionDupes.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=0&single=true&output=csv", 'r')); // Manual XXX RegionDupes
+        echo "\033[00;32mDone!\033[0m";
+    }
+    echo "\033[00;35m\n5/15 - Checking PS2 ManualDemos... \033[0m";
+    if (file_exists("{$parentDirectory}/Manual/PS2/ManualDemos.csv"))
+    {
+        if (sha1_file("{$parentDirectory}/Manual/PS2/ManualDemos.csv") === sha1_file("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1011714953&single=true&output=csv")) // Manual XXX Demos
+        
+        {
+            echo "\033[00;32mUp-to-date!\033[0m";
+        }
+        else
+        {
+            echo "\033[00;32mUpdate found! \033[00;35mDownloading... \033[0m";
+            file_put_contents("{$parentDirectory}/Manual/PS2/ManualDemos.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1011714953&single=true&output=csv", 'r')); // Manual XXX Demos
+            echo "\033[00;32mDone!\033[0m";
+        }
+    }
+    else
+    {
+        echo "\033[00;32mNo file found! \033[00;35mDownloading... \033[0m";
+        file_put_contents("{$parentDirectory}/Manual/PS2/ManualDemos.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1011714953&single=true&output=csv", 'r')); // Manual XXX Demos
+        echo "\033[00;32mDone!\033[0m";
+    }
+
+    echo "\033[00;35m\n6/15 - Checking PS2 ManualOthers... \033[0m";
+
+    if (file_exists("{$parentDirectory}/Manual/PS2/ManualOthers.csv"))
+    {
+        if (sha1_file("{$parentDirectory}/Manual/PS2/ManualOthers.csv") === sha1_file("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=975510366&single=true&output=csv")) // Manual XXX Others
+        
+        {
+            echo "\033[00;32mUp-to-date!\033[0m";
+        }
+        else
+        {
+            echo "\033[00;32mUpdate found! \033[00;35mDownloading... \033[0m";
+            file_put_contents("{$parentDirectory}/Manual/PS2/ManualOthers.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=975510366&single=true&output=csv", 'r')); // Manual XXX Others
+            echo "\033[00;32mDone!\033[0m";
+        }
+    }
+    else
+    {
+        echo "\033[00;32mNo file found! \033[00;35mDownloading... \033[0m";
+        file_put_contents("{$parentDirectory}/Manual/PS2/ManualOthers.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=975510366&single=true&output=csv", 'r')); // Manual XXX Others
+        echo "\033[00;32mDone!\033[0m";
+
+    }
+
+    echo "\033[00;35m\n7/15 - Checking DC ManualRegionDupes... \033[0m";
+    if (file_exists("{$parentDirectory}/Manual/DC/ManualRegionDupes.csv"))
+    {
+        if (sha1_file("{$parentDirectory}/Manual/DC/ManualRegionDupes.csv") === sha1_file("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1609459251&single=true&output=csv")) // Manual XXX RegionDupes
+        
+        {
+            echo "\033[00;32mUp-to-date!\033[0m";
+        }
+        else
+        {
+            echo "\033[00;32mUpdate found! \033[00;35mDownloading... \033[0m";
+            file_put_contents("{$parentDirectory}/Manual/DC/ManualRegionDupes.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1609459251&single=true&output=csv", 'r')); // Manual XXX RegionDupes
+            echo "\033[00;32mDone!\033[0m";
+        }
+    }
+    else
+    {
+        echo "\033[00;32mNo file found! \033[00;35mDownloading... \033[0m";
+        file_put_contents("{$parentDirectory}/Manual/DC/ManualRegionDupes.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1609459251&single=true&output=csv", 'r')); // Manual XXX RegionDupes
+        echo "\033[00;32mDone!\033[0m";
+    }
+    echo "\033[00;35m\n8/15 - Checking DC ManualDemos... \033[0m";
+    if (file_exists("{$parentDirectory}/Manual/DC/ManualDemos.csv"))
+    {
+        if (sha1_file("{$parentDirectory}/Manual/DC/ManualDemos.csv") === sha1_file("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1075472244&single=true&output=csv")) // Manual XXX Demos
+        
+        {
+            echo "\033[00;32mUp-to-date!\033[0m";
+        }
+        else
+        {
+            echo "\033[00;32mUpdate found! \033[00;35mDownloading... \033[0m";
+            file_put_contents("{$parentDirectory}/Manual/DC/ManualDemos.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1075472244&single=true&output=csv", 'r')); // Manual XXX Demos
+            echo "\033[00;32mDone!\033[0m";
+        }
+    }
+    else
+    {
+        echo "\033[00;32mNo file found! \033[00;35mDownloading... \033[0m";
+        file_put_contents("{$parentDirectory}/Manual/DC/ManualDemos.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1075472244&single=true&output=csv", 'r')); // Manual XXX Demos
+        echo "\033[00;32mDone!\033[0m";
+    }
+    echo "\033[00;35m\n9/15 - Checking DC ManualOthers... \033[0m";
+    if (file_exists("{$parentDirectory}/Manual/DC/ManualOthers.csv"))
+    {
+        if (sha1_file("{$parentDirectory}/Manual/DC/ManualOthers.csv") === sha1_file("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1555232317&single=true&output=csv")) // Manual XXX Others
+        
+        {
+            echo "\033[00;32mUp-to-date!\033[0m";
+        }
+        else
+        {
+            echo "\033[00;32mUpdate found! \033[00;35mDownloading... \033[0m";
+            file_put_contents("{$parentDirectory}/Manual/DC/ManualOthers.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1555232317&single=true&output=csv", 'r')); // Manual XXX Others
+            echo "\033[00;32mDone!\033[0m";
+
+        }
+    }
+    else
+    {
+        echo "\033[00;32mNo file found! \033[00;35mDownloading... \033[0m";
+        file_put_contents("{$parentDirectory}/Manual/DC/ManualOthers.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1555232317&single=true&output=csv", 'r')); // Manual XXX Others
+        echo "\033[00;32mDone!\033[0m";
+    }
+
+    echo "\033[00;35m\n10/15 - Checking GC ManualRegionDupes... \033[0m";
+    if (file_exists("{$parentDirectory}/Manual/GC/ManualRegionDupes.csv"))
+    {
+        if (sha1_file("{$parentDirectory}/Manual/GC/ManualRegionDupes.csv") === sha1_file("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1009860013&single=true&output=csv")) // Manual XXX RegionDupes
+        
+        {
+            echo "\033[00;32mUp-to-date!\033[0m";
+        }
+        else
+        {
+            echo "\033[00;32mUpdate found! \033[00;35mDownloading... \033[0m";
+            file_put_contents("{$parentDirectory}/Manual/GC/ManualRegionDupes.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1009860013&single=true&output=csv", 'r')); // Manual XXX RegionDupes
+            echo "\033[00;32mDone!\033[0m";
+        }
+    }
+    else
+    {
+        echo "\033[00;32mNo file found! \033[00;35mDownloading... \033[0m";
+        file_put_contents("{$parentDirectory}/Manual/GC/ManualRegionDupes.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1009860013&single=true&output=csv", 'r')); // Manual XXX RegionDupes
+        echo "\033[00;32mDone!\033[0m";
+    }
+    echo "\033[00;35m\n11/15 - Checking GC ManualDemos... \033[0m";
+    if (file_exists("{$parentDirectory}/Manual/GC/ManualDemos.csv"))
+    {
+        if (sha1_file("{$parentDirectory}/Manual/GC/ManualDemos.csv") === sha1_file("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1734185760&single=true&output=csv")) // Manual XXX Demos
+        
+        {
+            echo "\033[00;32mUp-to-date!\033[0m";
+        }
+        else
+        {
+            echo "\033[00;32mUpdate found! \033[00;35mDownloading... \033[0m";
+            file_put_contents("{$parentDirectory}/Manual/GC/ManualDemos.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1734185760&single=true&output=csv", 'r')); // Manual XXX Demos
+            echo "\033[00;32mDone!\033[0m";
+        }
+    }
+    else
+    {
+        echo "\033[00;32mNo file found! \033[00;35mDownloading... \033[0m";
+        file_put_contents("{$parentDirectory}/Manual/GC/ManualDemos.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1734185760&single=true&output=csv", 'r')); // Manual XXX Demos
+        echo "\033[00;32mDone!\033[0m";
+    }
+    echo "\033[00;35m\n12/15 - Checking GC ManualOthers... \033[0m";
+    if (file_exists("{$parentDirectory}/Manual/GC/ManualOthers.csv"))
+    {
+        if (sha1_file("{$parentDirectory}/Manual/GC/ManualOthers.csv") === sha1_file("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=2014414063&single=true&output=csv")) // Manual XXX Others
+        
+        {
+            echo "\033[00;32mUp-to-date!\033[0m";
+        }
+        else
+        {
+            echo "\033[00;32mUpdate found! \033[00;35mDownloading... \033[0m";
+            file_put_contents("{$parentDirectory}/Manual/GC/ManualOthers.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=2014414063&single=true&output=csv", 'r')); // Manual XXX Others
+            echo "\033[00;32mDone!\033[0m";
+
+        }
+    }
+    else
+    {
+        echo "\033[00;32mNo file found! \033[00;35mDownloading... \033[0m";
+        file_put_contents("{$parentDirectory}/Manual/GC/ManualOthers.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=2014414063&single=true&output=csv", 'r')); // Manual XXX Others
+        echo "\033[00;32mDone!\033[0m";
+    }
+
+    echo "\033[00;35m\n13/15 - Checking WII ManualRegionDupes... \033[0m";
+    if (file_exists("{$parentDirectory}/Manual/WII/ManualRegionDupes.csv"))
+    {
+        if (sha1_file("{$parentDirectory}/Manual/WII/ManualRegionDupes.csv") === sha1_file("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1901325025&single=true&output=csv")) // Manual XXX RegionDupes
+        
+        {
+            echo "\033[00;32mUp-to-date!\033[0m";
+        }
+        else
+        {
+            echo "\033[00;32mUpdate found! \033[00;35mDownloading... \033[0m";
+            file_put_contents("{$parentDirectory}/Manual/WII/ManualRegionDupes.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1901325025&single=true&output=csv", 'r')); // Manual XXX RegionDupes
+            echo "\033[00;32mDone!\033[0m";
+        }
+    }
+    else
+    {
+        echo "\033[00;32mNo file found! \033[00;35mDownloading... \033[0m";
+        file_put_contents("{$parentDirectory}/Manual/WII/ManualRegionDupes.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=1901325025&single=true&output=csv", 'r')); // Manual XXX RegionDupes
+        echo "\033[00;32mDone!\033[0m";
+    }
+    echo "\033[00;35m\n14/15 - Checking WII ManualDemos... \033[0m";
+    if (file_exists("{$parentDirectory}/Manual/WII/ManualDemos.csv"))
+    {
+        if (sha1_file("{$parentDirectory}/Manual/WII/ManualDemos.csv") === sha1_file("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=635615144&single=true&output=csv")) // Manual XXX Demos
+        
+        {
+            echo "\033[00;32mUp-to-date!\033[0m";
+        }
+        else
+        {
+            echo "\033[00;32mUpdate found! \033[00;35mDownloading... \033[0m";
+            file_put_contents("{$parentDirectory}/Manual/WII/ManualDemos.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=635615144&single=true&output=csv", 'r')); // Manual XXX Demos
+            echo "\033[00;32mDone!\033[0m";
+        }
+    }
+    else
+    {
+        echo "\033[00;32mNo file found! \033[00;35mDownloading... \033[0m";
+        file_put_contents("{$parentDirectory}/Manual/WII/ManualDemos.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=635615144&single=true&output=csv", 'r')); // Manual XXX Demos
+        echo "\033[00;32mDone!\033[0m";
+    }
+    echo "\033[00;35m\n15/15 - Checking WII ManualOthers... \033[0m";
+    if (file_exists("{$parentDirectory}/Manual/WII/ManualOthers.csv"))
+    {
+        if (sha1_file("{$parentDirectory}/Manual/WII/ManualOthers.csv") === sha1_file("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=678870629&single=true&output=csv")) // Manual XXX Others
+        
+        {
+            echo "\033[00;32mUp-to-date!\033[0m";
+        }
+        else
+        {
+
+            echo "\033[00;32mUpdate found! \033[00;35mDownloading... \033[0m";
+            file_put_contents("{$parentDirectory}/Manual/WII/ManualOthers.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=678870629&single=true&output=csv", 'r')); // Manual XXX Others
+            echo "\033[00;32mDone!\033[0m";
+        }
+    }
+    else
+    {
+        echo "\033[00;32mNo file found! \033[00;35mDownloading... \033[0m";
+        file_put_contents("{$parentDirectory}/Manual/WII/ManualOthers.csv", fopen("https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pub?gid=678870629&single=true&output=csv", 'r')); // Manual XXX Others
+        echo "\033[00;32mDone!\033[0m";
+    }
+}
+else
+{
+    echo "\033[35mUpdate skipped!\033[0m";
+}
+echo "\033[00;32m\n\nTo enable FilterQuest's built-in manual filters, please type the name of the system you are filtering games for. Alternatively, hit enter to continue without any manual filters,\n\n\033[0m";
 echo "\033[00;32mSystem? (ps1/ps2/dc/gc/wii/other): \033[0m";
 $phpSTDIN = fopen("php://stdin", "r");
 $userResponse = fgets($phpSTDIN);
@@ -55,43 +395,47 @@ if (trim(strtoupper($userResponse)) == 'WII')
 if (trim(strtoupper($userResponse)) == 'OTHER')
 {
     $selectedConsole = "OTHER";
+    $manualRegionDupesCSVLink = "{$parentDirectory}/Manual/Other/ManualRegionDupes.csv";
+    $manualDemosCSVLink = "{$parentDirectory}/Manual/Other/ManualDemos.csv";
+    $manualOthersCSVLink = "{$parentDirectory}/Manual/Other/ManualOthers.csv";
 }
-if (trim(strtoupper($userResponse)) == '')
+if (trim(strtoupper($userResponse)) !== 'PS1' && trim(strtoupper($userResponse)) !== 'PS2' && trim(strtoupper($userResponse)) !== 'DC' && trim(strtoupper($userResponse)) !== 'GC' && trim(strtoupper($userResponse)) !== 'WII' && trim(strtoupper($userResponse)) !== 'OTHER')
 {
-    echo "[None Selected]\n\n";
+    echo "\033[35mNone selected!\033[0m";
 }
 fclose($phpSTDIN);
 if (isset($selectedConsole))
 {
+    echo "\033[35m{$selectedConsole} selected!\033[0m";
     // Initialize ManualRegionDupes.csv
     if (file_exists("{$parentDirectory}/Manual/{$selectedConsole}/ManualRegionDupes.csv"))
     {
-        echo "\033[32m{$selectedConsole}'s ManualRegionDupes.csv has been found, \033[0m";
+        echo "\033[00;32m\n\n{$selectedConsole}'s ManualRegionDupes.csv has been found, \033[0m";
         if (trim(file_get_contents("{$parentDirectory}/Manual/{$selectedConsole}/ManualRegionDupes.csv")) == false)
         {
             echo "\033[33mbut is empty! Continuing without {$selectedConsole}'s Manual Region Dupes filter.\n\033[0m";
         }
         else
         {
-            echo "\033[32mand is NOT empty! Applying {$selectedConsole}'s Manual Region Dupes filter.\n\033[0m";
+            echo "\033[00;32mand is NOT empty! Applying {$selectedConsole}'s Manual Region Dupes filter.\n\033[0m";
             $anythingManual = true;
         }
     }
     else
     {
-        echo "\033[31m{$selectedConsole}'s ManualRegionDupes.csv has NOT been found. Continuing without the Manual Region Dupes filter.\n\033[0m";
+        echo "\033[31m\n\n{$selectedConsole}'s ManualRegionDupes.csv has NOT been found. Continuing without the Manual Region Dupes filter.\n\033[0m";
     }
     // Initialize ManualDemos.csv
     if (file_exists("{$parentDirectory}/Manual/{$selectedConsole}/ManualDemos.csv"))
     {
-        echo "\033[32m{$selectedConsole}'s ManualDemos.csv has been found, \033[0m";
+        echo "\033[00;32m{$selectedConsole}'s ManualDemos.csv has been found, \033[0m";
         if (trim(file_get_contents("{$parentDirectory}/Manual/{$selectedConsole}/ManualDemos.csv")) == false)
         {
             echo "\033[33mbut is empty! Continuing without {$selectedConsole}'s Manual Demos filter.\n\033[0m";
         }
         else
         {
-            echo "\033[32mand is NOT empty! Applying {$selectedConsole}'s Manual Demos filter.\n\033[0m";
+            echo "\033[00;32mand is NOT empty! Applying {$selectedConsole}'s Manual Demos filter.\n\033[0m";
             $anythingManual = true;
         }
     }
@@ -102,25 +446,167 @@ if (isset($selectedConsole))
     // Initialize ManualOthers.csv
     if (file_exists("{$parentDirectory}/Manual/{$selectedConsole}/ManualOthers.csv"))
     {
-        echo "\033[32m{$selectedConsole}'s ManualOthers.csv has been found, \033[0m";
+        echo "\033[00;32m{$selectedConsole}'s ManualOthers.csv has been found, \033[0m";
         if (trim(file_get_contents("{$parentDirectory}/Manual/{$selectedConsole}/ManualOthers.csv")) == false)
         {
-            echo "\033[33mbut is empty! Continuing without {$selectedConsole}'s Manual Others filter.\n\033[0m";
+            echo "\033[33mbut is empty! Continuing without {$selectedConsole}'s Manual Others filter.\033[0m";
         }
         else
         {
-            echo "\033[32mand is NOT empty! Applying {$selectedConsole}'s Manual Others filter.\n\033[0m";
+            echo "\033[00;32mand is NOT empty! Applying {$selectedConsole}'s Manual Others filter.\033[0m";
             $anythingManual = true;
         }
     }
     else
     {
-        echo "\033[31m{$selectedConsole}'s ManualOthers.csv has NOT been found. Continuing without the Manual Others filter.\n\033[0m";
+        echo "\033[31m{$selectedConsole}'s ManualOthers.csv has NOT been found. Continuing without the Manual Others filter.\033[0m";
     }
 }
+// --------------------------------------------------START OPTIONAL INTERMEDIATE PHASE-------------------------------------------------- //
+echo "\033[32;4;5m\n\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Starting Process >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\033[0m";
+if ($anythingManual == true)
+{
+    echo "\033[32;4;5m\nStarting Pass 1: Manual filter pass.\n\n\033[0m";
+    $fileArray = array_values(preg_grep('/^(\.|\.\.|Removed|FilterQuest)$/', scandir('.') , PREG_GREP_INVERT));
+    // --------------------------------------------------END OPTIONAL INTERMEDIATE PHASE-------------------------------------------------- //
+    // Do the magic for every file
+    foreach ($fileArray as $thisGame)
+    {
+        // --------------------------------------------------START PREP-------------------------------------------------- //
+        if (!$thisGame) continue; // Ensure continue if already removed
+        if (!file_exists($thisGame)) continue; // Ensure continue if already removed
+        if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
+        
+        {
+            $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
+            
+        }
+        else
+        {
+            $thisGameNoExtension = $thisGame; // If directory
+            
+        }
+        // Iterate with the mother of all preg matches and gain control of every portion of the filename
+        preg_match('/^(?!^$)(^.*?(?=\([^)]*(USA|UK|Europe|Australia|Asia|Austria|Belgium|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Ireland|Israel|Japan|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)[^)]*\)))(\([^)]*(USA|UK|Europe|Australia|Asia|Austria|Belgium|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Ireland|Israel|Japan|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)[^)]*\))(.*?)((\(En,(?:[A-Za-z]{2}[,)])+)(.*?))?((\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))(.*?))?(\.[a-zA-Z0-9]+)?$/', $thisGame, $thisGameMatched);
+        // Avoid undefined offset errors by giving anything that doesn't exist a blank value
+        if (!isset($thisGameMatched[1]))
+        {
+            $thisGameMatched[1] = "";
+        }
+        if (!isset($thisGameMatched[3]))
+        {
+            $thisGameMatched[3] = "";
+        }
+        if (!isset($thisGameMatched[5]))
+        {
+            $thisGameMatched[5] = "";
+        }
+        if (!isset($thisGameMatched[7]))
+        {
+            $thisGameMatched[7] = "";
+        }
+        if (!isset($thisGameMatched[8]))
+        {
+            $thisGameMatched[8] = "";
+        }
+        if (!isset($thisGameMatched[10]))
+        {
+            $thisGameMatched[10] = "";
+        }
+        if (!isset($thisGameMatched[13]))
+        {
+            $thisGameMatched[13] = "";
+        }
+        if (!isset($thisGameMatched[14]))
+        {
+            $thisGameMatched[14] = "";
+        }
+        // Escape matches for further matching, remove white space either side and give them all string names
+        $tgBare = preg_quote(trim($thisGameMatched[1]));
+        $tgRegions = preg_quote(trim($thisGameMatched[3]));
+        $tgRegionsCruft = preg_quote(trim($thisGameMatched[5]));
+        $tgLanguages = preg_quote(trim($thisGameMatched[7]));
+        $tgLanguagesCruft = preg_quote(trim($thisGameMatched[8]));
+        $tgVersion = preg_quote(trim($thisGameMatched[10]));
+        $tgVersionCruft = preg_quote(trim($thisGameMatched[13]));
+        $tgExtension = preg_quote(trim($thisGameMatched[14]));
+        // Let the user know what game is being evaluated
+        echo "\033[35m{$thisGameNoExtension} ... \033[0m";
+        // --------------------------------------------------END PREP-------------------------------------------------- //
+        // Remove filenames in ManualRegionDupes.csv if the primary version exists
+        if (file_exists("{$parentDirectory}/Manual/{$selectedConsole}/ManualRegionDupes.csv"))
+        {
+            $csvManualRegionDupes = fopen("{$parentDirectory}/Manual/{$selectedConsole}/ManualRegionDupes.csv", "r");
+            fgetcsv($csvManualRegionDupes, 999, ",");
+            while ($csvRow = fgetcsv($csvManualRegionDupes))
+            {
+                if (in_array($thisGameNoExtension, array_slice($csvRow, 1, 6)))
+                {
+                    $fileCheck = preg_grep('/^' . preg_quote($csvRow[0]) . '' . $tgExtension . '$/', $fileArray); // Assumes primary counterpart has same extension
+                    if ($fileCheck)
+                    {
+                        echo "\033[36mis on the Manual Region Dupes list and primary version detected. Moved to Removed folder.\n\033[0m";
+                        rename("$thisGame", "Removed/$thisGame");
+                        $csvManualRegionDupesRemoved = fopen("Removed/Logs/ManualRegionDupesRemoved.csv", "a");
+                        fwrite($csvManualRegionDupesRemoved, "\"" . $thisGameNoExtension . "\"\n");
+                        fclose($csvManualRegionDupesRemoved);
+                        continue 2;
+                    }
+                    else
+                    {
+                        echo "\033[31mis on the Manual Region Dupes list but primary version is missing. Kept for now.\n\033[0m";
+                        continue 2;
+                    }
+                }
+            }
+            fclose($csvManualRegionDupes);
+        }
+        // Remove filenames in ManualDemos.csv
+        if (file_exists("{$parentDirectory}/Manual/{$selectedConsole}/ManualDemos.csv"))
+        {
+            $csvManualDemos = fopen("{$parentDirectory}/Manual/{$selectedConsole}/ManualDemos.csv", "r");
+            fgetcsv($csvManualDemos, 999, ",");
+            while ($csvRow = fgetcsv($csvManualDemos))
+            {
+                if (in_array($thisGameNoExtension, array_slice($csvRow, 0)))
+                {
+                    echo "\033[36mis on the Manual Demos remove list. Moved to Removed folder.\n\033[0m";
+                    rename("$thisGame", "Removed/$thisGame");
+                    $csvManualDemosRemoved = fopen("Removed/Logs/ManualDemosRemoved.csv", "a");
+                    fwrite($csvManualDemosRemoved, "\"" . $thisGameNoExtension . "\"\n");
+                    fclose($csvManualDemosRemoved);
+                    continue 2;
+                }
+            }
+        }
+        // Remove filenames in ManualOthers.csv
+        if (file_exists("{$parentDirectory}/Manual/{$selectedConsole}/ManualOthers.csv"))
+        {
+            $csvManualOthers = fopen("{$parentDirectory}/Manual/{$selectedConsole}/ManualOthers.csv", "r");
+            fgetcsv($csvManualOthers, 999, ",");
+            while ($csvRow = fgetcsv($csvManualOthers))
+            {
+                if (in_array($thisGameNoExtension, array_slice($csvRow, 0)))
+                {
+                    echo "\033[36mis on the Manual Others remove list. Moved to Removed folder.\n\033[0m";
+                    rename("$thisGame", "Removed/$thisGame");
+                    $csvManualOthersRemoved = fopen("Removed/Logs/ManualOthersRemoved.csv", "a");
+                    fwrite($csvManualOthersRemoved, "\"" . $thisGameNoExtension . "\"\n");
+                    fclose($csvManualOthersRemoved);
+                    continue 2;
+                }
+            }
+        }
+        echo "\033[00;32mis not on any manual remove lists. Kept.\n\033[0m";
+    }
+    echo "\033[32;4;5m\nPass 1 Complete!\033[0m";
+}
+else
+{
+    echo "\033[32;4;5m\nSkipping Pass 1: Manual filter pass - no manual filters selected.\n\033[0m";
+}
 // --------------------------------------------------START INTERMEDIATE PHASE-------------------------------------------------- //
-echo "\033[32;4;5m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Starting Process >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n\033[0m";
-echo "\033[32;4;5m\nStarting Pass 1: Removing foreign releases and non-full retail releases.\n\n\033[0m";
+echo "\033[32;4;5m\nStarting Pass 2: Removing foreign releases and non-full retail releases.\n\n\033[0m";
 $fileArray = array_values(preg_grep('/^(\.|\.\.|Removed|FilterQuest)$/', scandir('.') , PREG_GREP_INVERT)); // List all files in directory, rearranging tokens after grepping out unwanted things from the scan.
 // --------------------------------------------------END INTERMEDIATE PHASE-------------------------------------------------- //
 // Do the magic for every file
@@ -130,15 +616,17 @@ foreach ($fileArray as $thisGame)
     if (!$thisGame) continue; // Ensure continue if already removed
     if (!file_exists($thisGame)) continue; // Ensure continue if already removed
     if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
+    
     {
         $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
+        
     }
     else
     {
         $thisGameNoExtension = $thisGame;
     }
     // Iterate with the mother of all preg matches and gain control of every portion of the filename
-    preg_match('/^(?!^$)(^.*?(?=\([^)]*(USA|UK|Europe|Australia)[^)]*\)))(\([^)]*(USA|UK|Europe|Australia)[^)]*\))(.*?)((\(En,(?:[A-Za-z]{2}[,)])+)(.*?))?((\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))(.*?))?(\.[a-zA-Z0-9]+)?$/', $thisGame, $thisGameMatched);
+    preg_match('/^(?!^$)(^.*?(?=\([^)]*(USA|UK|Europe|Australia|Asia|Austria|Belgium|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Ireland|Israel|Japan|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)[^)]*\)))(\([^)]*(USA|UK|Europe|Australia|Asia|Austria|Belgium|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Ireland|Israel|Japan|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)[^)]*\))(.*?)((\(En,(?:[A-Za-z]{2}[,)])+)(.*?))?((\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))(.*?))?(\.[a-zA-Z0-9]+)?$/', $thisGame, $thisGameMatched);
     // Avoid undefined offset errors by giving anything that doesn't exist a blank value
     if (!isset($thisGameMatched[1]))
     {
@@ -185,7 +673,8 @@ foreach ($fileArray as $thisGame)
     echo "\033[35m{$thisGameNoExtension} ... \033[0m";
     // --------------------------------------------------END PREP-------------------------------------------------- //
     // REMOVE - non-English-speaking countries e.g. "(France)" or "(Japan)"
-    if (preg_match('/\((?=[^)]*(Asia|Austria|Belgium|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Israel|Italy|Japan|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland))(?![^)]*(USA|UK|Europe|Australia))[^)]+\)/', $thisGame, $thisGameMatches))
+        // IF THISGAME MATCHES BAD REGION && DOES NOT MATCH GOOD REGION
+        if (preg_match('/[( ](Asia|Austria|Belgium|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Ireland|Israel|Japan|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)[,)]/', $thisGame, $thisGameMatches) && !preg_match('/[( ](USA|UK|Europe|Australia)[,)]/', $thisGame))
     {
         echo "\033[00;36mforeign release detected: \033[01;34m{$thisGameMatches[0]}\033[00;36m - Moved to Removed folder.\n\033[0m";
         rename("$thisGame", "Removed/$thisGame");
@@ -199,17 +688,17 @@ foreach ($fileArray as $thisGame)
         continue;
     }
     // REMOVE - non-full retail release e.g. "(Demo)", "(Kiosk)"
-    if (preg_match('/\((Beta|Beta \d+|Debug|Demo|Demo \d+|Developer Cart|EDC|Kiosk|Preview|Review|Review Build|Sample|Unl|Video Demo)\)/', $thisGame, $thisGameMatches))
+    if (preg_match('/\((Beta|Beta \d+|Debug|Demo|Demo \d+|Developer Cart|EDC|Kiosk|Preview|Review|Review Build|Sample|Unl|Video Demo)\)|.+ \+ .+/', $thisGame, $thisGameMatches))
     {
         echo "\033[00;36mnon-retail release detected: \033[01;34m{$thisGameMatches[0]}\033[00;36m - Moved to Removed folder.\n\033[0m";
         rename("$thisGame", "Removed/$thisGame");
         continue;
     }
-    echo "\033[32mis not a foreign or non-retail release. Kept\n\033[0m";
+    echo "\033[00;32mis not a foreign or non-retail release. Kept\n\033[0m";
 }
 // --------------------------------------------------START INTERMEDIATE PHASE-------------------------------------------------- //
-echo "\033[32;4;5m\nPass 1 Complete!\033[0m";
-echo "\033[32;4;5m\nStarting Pass 2: Prioritizing in the order: USA > UK > EUR > AUS > Anything Else!\n\n\033[0m";
+echo "\033[32;4;5m\nPass 2 Complete!\033[0m";
+echo "\033[32;4;5m\nStarting Pass 3: Prioritizing in the order: USA > UK > EUR > AUS > Anything Else!\n\n\033[0m";
 $fileArray = array_values(preg_grep('/^(\.|\.\.|Removed|FilterQuest)$/', scandir('.') , PREG_GREP_INVERT));
 // --------------------------------------------------END INTERMEDIATE PHASE-------------------------------------------------- //
 // Do the magic for every file
@@ -219,15 +708,17 @@ foreach ($fileArray as $thisGame)
     if (!$thisGame) continue; // Ensure continue if already removed
     if (!file_exists($thisGame)) continue; // Ensure continue if already removed
     if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
+    
     {
         $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
+        
     }
     else
     {
         $thisGameNoExtension = $thisGame;
     }
     // Iterate with the mother of all preg matches and gain control of every portion of the filename
-    preg_match('/^(?!^$)(^.*?(?=\([^)]*(USA|UK|Europe|Australia)[^)]*\)))(\([^)]*(USA|UK|Europe|Australia)[^)]*\))(.*?)((\(En,(?:[A-Za-z]{2}[,)])+)(.*?))?((\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))(.*?))?(\.[a-zA-Z0-9]+)?$/', $thisGame, $thisGameMatched);
+    preg_match('/^(?!^$)(^.*?(?=\([^)]*(USA|UK|Europe|Australia|Asia|Austria|Belgium|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Ireland|Israel|Japan|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)[^)]*\)))(\([^)]*(USA|UK|Europe|Australia|Asia|Austria|Belgium|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Ireland|Israel|Japan|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)[^)]*\))(.*?)((\(En,(?:[A-Za-z]{2}[,)])+)(.*?))?((\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))(.*?))?(\.[a-zA-Z0-9]+)?$/', $thisGame, $thisGameMatched);
     // Avoid undefined offset errors by giving anything that doesn't exist a blank value
     if (!isset($thisGameMatched[1]))
     {
@@ -285,7 +776,7 @@ foreach ($fileArray as $thisGame)
         }
     }
     // PRIORITIZE - Check for a combined USA version IF NO (USA) OR (COMBINED USA) EXISTS
-    if (!preg_match('/\([^)]*(USA)[^)]*\)/', $thisGame))
+    if (!preg_match('/[( ](USA)[,)]/', $thisGame))
     {
         $fileCheck = preg_grep('/^' . $tgBare . ' \((?=.*USA).+, [^)]+\).*$/', $fileArray);
         if ($fileCheck)
@@ -296,7 +787,7 @@ foreach ($fileArray as $thisGame)
         }
     }
     // PRIORITIZE - Check for pure UK only version IF NO PURE (UK) or ANY (USA)
-    if (!preg_match('/\(UK\)|\([^)]*(USA)[^)]*\)/', $thisGame))
+    if (!preg_match('/\(UK\)|[( ](USA)[,)]/', $thisGame))
     {
         $fileCheck = preg_grep('/^' . $tgBare . ' \(UK\).*$/', $fileArray);
         if ($fileCheck)
@@ -307,7 +798,7 @@ foreach ($fileArray as $thisGame)
         }
     }
     // PRIORITIZE - Check for a combined UK version IF ANY (USA) OR (UK) EXISTS
-    if (!preg_match('/\([^)]*(USA|UK)[^)]*\)/', $thisGame))
+    if (!preg_match('/[( ](USA|UK)[,)]/', $thisGame))
     {
         $fileCheck = preg_grep('/^' . $tgBare . ' \((?=.*UK).+, [^)]+\).*$/', $fileArray);
         if ($fileCheck)
@@ -318,7 +809,7 @@ foreach ($fileArray as $thisGame)
         }
     }
     // PRIORITIZE - Check for pure Europe only version IF NO PURE (Europe) or ANY (USA) or (UK) EXISTS
-    if (!preg_match('/\(Europe\)|\([^)]*(USA|UK)[^)]*\)/', $thisGame))
+    if (!preg_match('/\(Europe\)|[( ](USA|UK)[,)]/', $thisGame))
     {
         $fileCheck = preg_grep('/^' . $tgBare . ' \(Europe\).*$/', $fileArray);
         if ($fileCheck)
@@ -329,7 +820,7 @@ foreach ($fileArray as $thisGame)
         }
     }
     // PRIORITIZE - Check for a combined Europe version IF ANY (USA) OR (UK) OR (EUROPE) EXISTS
-    if (!preg_match('/\([^)]*(USA|UK|Europe)[^)]*\)/', $thisGame))
+    if (!preg_match('/[( ](USA|UK|Europe)[,)]/', $thisGame))
     {
         $fileCheck = preg_grep('/^' . $tgBare . ' \((?=.*Europe).+, [^)]+\).*$/', $fileArray);
         if ($fileCheck)
@@ -340,7 +831,7 @@ foreach ($fileArray as $thisGame)
         }
     }
     // PRIORITIZE - Check for pure Australia only version IF NO PURE (AUSTRALIA) or ANY (USA), (UK) OR (EUROPE)
-    if (!preg_match('/\(Australia\)|\([^)]*(USA|UK|Europe)[^)]*\)/', $thisGame))
+    if (!preg_match('/\(Australia\)|[( ](USA|UK|Europe)[,)]/', $thisGame))
     {
         $fileCheck = preg_grep('/^' . $tgBare . ' \(Australia\).*$/', $fileArray);
         if ($fileCheck)
@@ -351,7 +842,7 @@ foreach ($fileArray as $thisGame)
         }
     }
     // PRIORITIZE - Check for a combined Australia version IF ANY (AUSTRALIA), (USA), (UK) OR (EUROPE) EXISTS
-    if (!preg_match('/\([^)]*(USA|UK|Europe|Australia)[^)]*\)/', $thisGame))
+    if (!preg_match('/[( ](USA|UK|Europe|Australia)[,)]/', $thisGame))
     {
         $fileCheck = preg_grep('/^' . $tgBare . ' \((?=.*Australia).+, [^)]+\).*$/', $fileArray);
         if ($fileCheck)
@@ -361,11 +852,11 @@ foreach ($fileArray as $thisGame)
             continue;
         }
     }
-    echo "\033[32mhas no better regional version. Kept.\n\033[0m";
+    echo "\033[00;32mhas no better regional version. Kept.\n\033[0m";
 }
 // --------------------------------------------------START INTERMEDIATE PHASE-------------------------------------------------- //
-echo "\033[32;4;5m\nPass 2 Complete!\033[0m";
-echo "\033[32;4;5m\nStarting Pass 3: Prioritizing versions with fewer languages.\n\n\033[0m";
+echo "\033[32;4;5m\nPass 3 Complete!\033[0m";
+echo "\033[32;4;5m\nStarting Pass 4: Prioritizing versions with fewer languages.\n\n\033[0m";
 $fileArray = array_values(preg_grep('/^(\.|\.\.|Removed|FilterQuest)$/', scandir('.') , PREG_GREP_INVERT));
 // --------------------------------------------------END INTERMEDIATE PHASE-------------------------------------------------- //
 // Do the magic for every file
@@ -375,15 +866,17 @@ foreach ($fileArray as $thisGame)
     if (!$thisGame) continue; // Ensure continue if already removed
     if (!file_exists($thisGame)) continue; // Ensure continue if already removed
     if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
+    
     {
         $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
+        
     }
     else
     {
         $thisGameNoExtension = $thisGame;
     }
     // Iterate with the mother of all preg matches and gain control of every portion of the filename
-    preg_match('/^(?!^$)(^.*?(?=\([^)]*(USA|UK|Europe|Australia)[^)]*\)))(\([^)]*(USA|UK|Europe|Australia)[^)]*\))(.*?)((\(En,(?:[A-Za-z]{2}[,)])+)(.*?))?((\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))(.*?))?(\.[a-zA-Z0-9]+)?$/', $thisGame, $thisGameMatched);
+    preg_match('/^(?!^$)(^.*?(?=\([^)]*(USA|UK|Europe|Australia|Asia|Austria|Belgium|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Ireland|Israel|Japan|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)[^)]*\)))(\([^)]*(USA|UK|Europe|Australia|Asia|Austria|Belgium|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Ireland|Israel|Japan|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)[^)]*\))(.*?)((\(En,(?:[A-Za-z]{2}[,)])+)(.*?))?((\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))(.*?))?(\.[a-zA-Z0-9]+)?$/', $thisGame, $thisGameMatched);
     // Avoid undefined offset errors by giving anything that doesn't exist a blank value
     if (!isset($thisGameMatched[1]))
     {
@@ -478,8 +971,8 @@ foreach ($fileArray as $thisGame)
                     if ($thisLanguageBracketLength == $otherLanguageBracketLength) // Try again to differentiate, this time with just France & Spain
                     
                     {
-                        $thisLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Fr|Es)(?=[,)])/', '', $thisLanguageBracket);
-                        $otherLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Fr|Es)(?=[,)])/', '', $otherLanguageBracket);
+                        $thisLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Fr)(?=[,)])/', '', $thisLanguageBracket);
+                        $otherLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Fr)(?=[,)])/', '', $otherLanguageBracket);
                         $thisLanguageBracketLength = strlen($thisLanguageBracketReduced[0]);
                         $otherLanguageBracketLength = strlen($otherLanguageBracketReduced[0]);
                         if ($thisLanguageBracketLength > $otherLanguageBracketLength)
@@ -492,8 +985,8 @@ foreach ($fileArray as $thisGame)
                         if ($thisLanguageBracketLength == $otherLanguageBracketLength) // Try one last time differentiate, this time with Netherlands
                         
                         {
-                            $thisLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Nl)(?=[,)])/', '', $thisLanguageBracket);
-                            $otherLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Nl)(?=[,)])/', '', $otherLanguageBracket);
+                            $thisLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Es)(?=[,)])/', '', $thisLanguageBracket);
+                            $otherLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Es)(?=[,)])/', '', $otherLanguageBracket);
                             $thisLanguageBracketLength = strlen($thisLanguageBracketReduced[0]);
                             $otherLanguageBracketLength = strlen($otherLanguageBracketReduced[0]);
                             if ($thisLanguageBracketLength > $otherLanguageBracketLength)
@@ -503,23 +996,68 @@ foreach ($fileArray as $thisGame)
                                 rename("$thisGame", "Removed/$thisGame");
                                 continue 2;
                             }
-                        }
-                        if ($thisLanguageBracketLength == $otherLanguageBracketLength)
-                        {
-                            $otherGameNoExtension = pathinfo($otherGame, PATHINFO_FILENAME); // Remove file extension
-                            echo "\033[31mCannot differentiate between \033[01;34m{$thisGameNoExtension}\033[00;31m and \033[01;34m{$otherGameNoExtension}\033[00;31m as both have the same number of key languages. Both kept.\n\033[0m";
-                            continue 2;
+                            if ($thisLanguageBracketLength == $otherLanguageBracketLength) // Try one last time differentiate, this time with Netherlands
+                            
+                            {
+                                $thisLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(De)(?=[,)])/', '', $thisLanguageBracket);
+                                $otherLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(De)(?=[,)])/', '', $otherLanguageBracket);
+                                $thisLanguageBracketLength = strlen($thisLanguageBracketReduced[0]);
+                                $otherLanguageBracketLength = strlen($otherLanguageBracketReduced[0]);
+                                if ($thisLanguageBracketLength > $otherLanguageBracketLength)
+                                {
+                                    // Other version has more favourable languages after three passes, bin ours
+                                    echo "\033[00;36mSame amount but less favourable languages detected. Phew! \033[01;34m{$otherLanguageBracket[0]}\033[00;36m VS. \033[01;34m{$thisLanguageBracket[0]}\033[00;36m - Moved to Removed folder.\n\033[0m";
+                                    rename("$thisGame", "Removed/$thisGame");
+                                    continue 2;
+                                }
+                                if ($thisLanguageBracketLength == $otherLanguageBracketLength) // Try one last time differentiate, this time with Netherlands
+                                
+                                {
+                                    $thisLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(It)(?=[,)])/', '', $thisLanguageBracket);
+                                    $otherLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(It)(?=[,)])/', '', $otherLanguageBracket);
+                                    $thisLanguageBracketLength = strlen($thisLanguageBracketReduced[0]);
+                                    $otherLanguageBracketLength = strlen($otherLanguageBracketReduced[0]);
+                                    if ($thisLanguageBracketLength > $otherLanguageBracketLength)
+                                    {
+                                        // Other version has more favourable languages after three passes, bin ours
+                                        echo "\033[00;36mSame amount but less favourable languages detected. Phew! \033[01;34m{$otherLanguageBracket[0]}\033[00;36m VS. \033[01;34m{$thisLanguageBracket[0]}\033[00;36m - Moved to Removed folder.\n\033[0m";
+                                        rename("$thisGame", "Removed/$thisGame");
+                                        continue 2;
+                                    }
+                                    if ($thisLanguageBracketLength == $otherLanguageBracketLength) // Try one last time differentiate, this time with Netherlands
+                                    
+                                    {
+                                        $thisLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Nl)(?=[,)])/', '', $thisLanguageBracket);
+                                        $otherLanguageBracketReduced = preg_replace('/(?<=[A-Z][a-z],)(Nl)(?=[,)])/', '', $otherLanguageBracket);
+                                        $thisLanguageBracketLength = strlen($thisLanguageBracketReduced[0]);
+                                        $otherLanguageBracketLength = strlen($otherLanguageBracketReduced[0]);
+                                        if ($thisLanguageBracketLength > $otherLanguageBracketLength)
+                                        {
+                                            // Other version has more favourable languages after three passes, bin ours
+                                            echo "\033[00;36mSame amount but less favourable languages detected. Phew! \033[01;34m{$otherLanguageBracket[0]}\033[00;36m VS. \033[01;34m{$thisLanguageBracket[0]}\033[00;36m - Moved to Removed folder.\n\033[0m";
+                                            rename("$thisGame", "Removed/$thisGame");
+                                            continue 2;
+                                        }
+                                        if ($thisLanguageBracketLength == $otherLanguageBracketLength)
+                                        {
+                                            $otherGameNoExtension = pathinfo($otherGame, PATHINFO_FILENAME); // Remove file extension
+                                            echo "\033[31mCannot differentiate between \033[01;34m{$thisGameNoExtension}\033[00;31m and \033[01;34m{$otherGameNoExtension}\033[00;31m as both have the same number of key languages. Both kept.\n\033[0m";
+                                            continue 2;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
         }
     }
-    echo "\033[32mhas the least languages for its kind. Kept.\n\033[0m";
+    echo "\033[00;32mhas the least languages for its kind. Kept.\n\033[0m";
 }
 // --------------------------------------------------START INTERMEDIATE PHASE-------------------------------------------------- //
-echo "\033[32;4;5m\nPass 3 Complete!\033[0m";
-echo "\033[32;4;5m\nStarting Pass 4: Prioritizing newer versions.\n\n\033[0m";
+echo "\033[32;4;5m\nPass 4 Complete!\033[0m";
+echo "\033[32;4;5m\nStarting Pass 5: Prioritizing newer versions.\n\n\033[0m";
 $fileArray = array_values(preg_grep('/^(\.|\.\.|Removed|FilterQuest)$/', scandir('.') , PREG_GREP_INVERT));
 // --------------------------------------------------END INTERMEDIATE PHASE-------------------------------------------------- //
 // Do the magic for every file
@@ -529,15 +1067,17 @@ foreach ($fileArray as $thisGame)
     if (!$thisGame) continue; // Ensure continue if already removed
     if (!file_exists($thisGame)) continue; // Ensure continue if already removed
     if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
+    
     {
         $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
+        
     }
     else
     {
         $thisGameNoExtension = $thisGame;
     }
     // Iterate with the mother of all preg matches and gain control of every portion of the filename
-    preg_match('/^(?!^$)(^.*?(?=\([^)]*(USA|UK|Europe|Australia)[^)]*\)))(\([^)]*(USA|UK|Europe|Australia)[^)]*\))(.*?)((\(En,(?:[A-Za-z]{2}[,)])+)(.*?))?((\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))(.*?))?(\.[a-zA-Z0-9]+)?$/', $thisGame, $thisGameMatched);
+    preg_match('/^(?!^$)(^.*?(?=\([^)]*(USA|UK|Europe|Australia|Asia|Austria|Belgium|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Ireland|Israel|Japan|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)[^)]*\)))(\([^)]*(USA|UK|Europe|Australia|Asia|Austria|Belgium|Brazil|China|Croatia|Denmark|Finland|France|Germany|Greece|Hungary|India|Ireland|Israel|Japan|Italy|Korea|Latin America|Netherlands|Norway|Poland|Portugal|Russia|Scandinavia|South Africa|Spain|Sweden|Switzerland)[^)]*\))(.*?)((\(En,(?:[A-Za-z]{2}[,)])+)(.*?))?((\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))(.*?))?(\.[a-zA-Z0-9]+)?$/', $thisGame, $thisGameMatched);
     // Avoid undefined offset errors by giving anything that doesn't exist a blank value
     if (!isset($thisGameMatched[1]))
     {
@@ -648,146 +1188,10 @@ foreach ($fileArray as $thisGame)
             }
         }
     }
-    echo "\033[32mis the most recent version of it's kind. Kept.\n\033[0m";
+    echo "\033[00;32mis the most recent version of it's kind. Kept.\n\033[0m";
 }
-// --------------------------------------------------START OPTIONAL INTERMEDIATE PHASE-------------------------------------------------- //
-echo "\033[32;4;5m\nPass 4 Complete!\033[0m";
-if ($anythingManual == true)
-{
-    echo "\033[32;4;5m\nStarting Pass 5: Manual filter pass.\n\n\033[0m";
-    $fileArray = array_values(preg_grep('/^(\.|\.\.|Removed|FilterQuest)$/', scandir('.') , PREG_GREP_INVERT));
-    // --------------------------------------------------END OPTIONAL INTERMEDIATE PHASE-------------------------------------------------- //
-    // Do the magic for every file
-    foreach ($fileArray as $thisGame)
-    {
-        // --------------------------------------------------START PREP-------------------------------------------------- //
-        if (!$thisGame) continue; // Ensure continue if already removed
-        if (!file_exists($thisGame)) continue; // Ensure continue if already removed
-        if (preg_match('/^.*?(?=\.[a-zA-Z0-9]+$)/', $thisGame, $thisGameNoExtension)) // Preg Match the file extension
-        {
-            $thisGameNoExtension = $thisGameNoExtension[0]; // Give the file extension it's own string
-        }
-        else
-        {
-            $thisGameNoExtension = $thisGame;
-        }
-        // Iterate with the mother of all preg matches and gain control of every portion of the filename
-        preg_match('/^(?!^$)(^.*?(?=\([^)]*(USA|UK|Europe|Australia)[^)]*\)))(\([^)]*(USA|UK|Europe|Australia)[^)]*\))(.*?)((\(En,(?:[A-Za-z]{2}[,)])+)(.*?))?((\(v([0-9]+\.[0-9]+|[0-9]+)\)|\(Rev ([A-Z]|[0-9]+)\))(.*?))?(\.[a-zA-Z0-9]+)?$/', $thisGame, $thisGameMatched);
-        // Avoid undefined offset errors by giving anything that doesn't exist a blank value
-        if (!isset($thisGameMatched[1]))
-        {
-            $thisGameMatched[1] = "";
-        }
-        if (!isset($thisGameMatched[3]))
-        {
-            $thisGameMatched[3] = "";
-        }
-        if (!isset($thisGameMatched[5]))
-        {
-            $thisGameMatched[5] = "";
-        }
-        if (!isset($thisGameMatched[7]))
-        {
-            $thisGameMatched[7] = "";
-        }
-        if (!isset($thisGameMatched[8]))
-        {
-            $thisGameMatched[8] = "";
-        }
-        if (!isset($thisGameMatched[10]))
-        {
-            $thisGameMatched[10] = "";
-        }
-        if (!isset($thisGameMatched[13]))
-        {
-            $thisGameMatched[13] = "";
-        }
-        if (!isset($thisGameMatched[14]))
-        {
-            $thisGameMatched[14] = "";
-        }
-        // Escape matches for further matching, remove white space either side and give them all string names
-        $tgBare = preg_quote(trim($thisGameMatched[1]));
-        $tgRegions = preg_quote(trim($thisGameMatched[3]));
-        $tgRegionsCruft = preg_quote(trim($thisGameMatched[5]));
-        $tgLanguages = preg_quote(trim($thisGameMatched[7]));
-        $tgLanguagesCruft = preg_quote(trim($thisGameMatched[8]));
-        $tgVersion = preg_quote(trim($thisGameMatched[10]));
-        $tgVersionCruft = preg_quote(trim($thisGameMatched[13]));
-        $tgExtension = preg_quote(trim($thisGameMatched[14]));
-        // Let the user know what game is being evaluated
-        echo "\033[35m{$thisGameNoExtension} ... \033[0m";
-        // --------------------------------------------------END PREP-------------------------------------------------- //
-        // Remove filenames in ManualRegionDupes.csv if the primary version exists
-        if (file_exists("{$parentDirectory}/Manual/{$selectedConsole}/ManualRegionDupes.csv"))
-        {
-            $csvManualRegionDupes = fopen("{$parentDirectory}/Manual/{$selectedConsole}/ManualRegionDupes.csv", "r");
-            while ($csvRow = fgetcsv($csvManualRegionDupes))
-            {
-                if (in_array($thisGameNoExtension, array_slice($csvRow, 1, 3)))
-                {
-                    $fileCheck = preg_grep('/^' . preg_quote($csvRow[0]) . '' . $tgExtension . '$/', $fileArray); // Assumes primary counterpart has same extension
-                    if ($fileCheck)
-                    {
-                        echo "\033[36mis on the Manual Region Dupes list and primary version detected. Moved to Removed folder.\n\033[0m";
-                        rename("$thisGame", "Removed/$thisGame");
-                        $csvManualRegionDupesRemoved = fopen("Removed/Logs/ManualRegionDupesRemoved.csv", "a");
-                        fwrite($csvManualRegionDupesRemoved, "\"" . $thisGameNoExtension . "\"\n");
-                        fclose($csvManualRegionDupesRemoved);
-                        continue 2;
-                    }
-                    else
-                    {
-                        echo "\033[31mis on the Manual Region Dupes list but primary version is missing. Kept for now.\n\033[0m";
-                        continue 2;
-                    }
-                }
-            }
-            fclose($csvManualRegionDupes);
-        }
-        // Remove filenames in ManualDemos.csv
-        if (file_exists("{$parentDirectory}/Manual/{$selectedConsole}/ManualDemos.csv"))
-        {
-            $csvManualDemos = fopen("{$parentDirectory}/Manual/{$selectedConsole}/ManualDemos.csv", "r");
-            while ($csvRow = fgetcsv($csvManualDemos))
-            {
-                if (in_array($thisGameNoExtension, array_slice($csvRow, 0)))
-                {
-                    echo "\033[36mis on the Manual Demos remove list. Moved to Removed folder.\n\033[0m";
-                    rename("$thisGame", "Removed/$thisGame");
-                    $csvManualDemosRemoved = fopen("Removed/Logs/ManualDemosRemoved.csv", "a");
-                    fwrite($csvManualDemosRemoved, "\"" . $thisGameNoExtension . "\"\n");
-                    fclose($csvManualDemosRemoved);
-                    continue 2;
-                }
-            }
-        }
-        // Remove filenames in ManualOthers.csv
-        if (file_exists("{$parentDirectory}/Manual/{$selectedConsole}/ManualOthers.csv"))
-        {
-            $csvManualOthers = fopen("{$parentDirectory}/Manual/{$selectedConsole}/ManualOthers.csv", "r");
-            while ($csvRow = fgetcsv($csvManualOthers))
-            {
-                if (in_array($thisGameNoExtension, array_slice($csvRow, 0)))
-                {
-                    echo "\033[36mis on the Manual Others remove list. Moved to Removed folder.\n\033[0m";
-                    rename("$thisGame", "Removed/$thisGame");
-                    $csvManualOthersRemoved = fopen("Removed/Logs/ManualOthersRemoved.csv", "a");
-                    fwrite($csvManualOthersRemoved, "\"" . $thisGameNoExtension . "\"\n");
-                    fclose($csvManualOthersRemoved);
-                    continue 2;
-                }
-            }
-        }
-        echo "\033[32mis not on any manual remove lists. Kept.\n\033[0m";
-    }
-    // --------------------------------------------------START OPTIONAL INTERMEDIATE PHASE-------------------------------------------------- //
-    echo "\033[32;4;5m\nPass 5 Complete!\033[0m";
-    // --------------------------------------------------END OPTIONAL INTERMEDIATE PHASE-------------------------------------------------- //
-}
-else
-{
-    echo "\033[32;4;5m\nPass 5: Manual filter pass - no manual filters selected.\n\033[0m";
-}
-echo "\033[32;4m\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Process Complete! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n\033[0m";
+// --------------------------------------------------START INTERMEDIATE PHASE-------------------------------------------------- //
+echo "\033[32;4;5m\nPass 5 Complete!\033[0m";
+// --------------------------------------------------END INTERMEDIATE PHASE-------------------------------------------------- //
+echo "\033[32;4m\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Process Complete! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n\033[0m";
 ?>
