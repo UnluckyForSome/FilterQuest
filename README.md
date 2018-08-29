@@ -23,6 +23,9 @@ FilterQuest **won't delete any files**. The script will output a folder named "R
 - **Versions & Reversions:**
 Lower versions of the same game will be removed - e.g. if "Game (USA) (v1.2)" exists "Game (USA) (v1.1)" will be removed. If "Game (USA) (Rev A)" exists "Game (USA) (Rev B)" will be removed.
 
+- **Game Compilations:**
+Sometimes games are put together - FilterQuest will check if the individual games exist and if they do, go with them instead - e.g. if Game 1 (USA) and Game 2 (USA) exist seperately, Game 1 + Game 2 (USA) will be removed.
+
 - **Manual Region Duplicates:**
 Not all games have the same names in different regions and so can't automatically be filtered. To tackle this, FilterQuest has regularly updated built in "[lists](https://docs.google.com/spreadsheets/d/e/2PACX-1vSkAN3XgqCx4Mn86KwX4c-fDMXQQOR0a2TnFKcMxDzux0AGtS8yAxpUKBwws1ozT86Vcxzy6AB37PFJ/pubhtml?gid=1464817576#)" which it uses to identify that a "primary" game is present and then subsequently removes the region duplicate. If no primary version is present it is left alone. You can view these lists with the link above.
 
